@@ -303,16 +303,32 @@ class _UserMainPageState extends State<UserMainPage> {
         key: _fromkey,
         child: ListView(
           children: [
-            if (userName !=
-                null) // Display the user's name at the top of the page
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Welcome, $userName!', // Display the user's name here
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+            if (userName != null)
+              Container(
+                padding: EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Text(
+                      'Welcome,',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.black,
+                        fontFamily:
+                            'YourCustomFont', // Replace with your custom font
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      userName!,
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            'YourCustomFont', // Replace with your custom font
+                      ),
+                    ),
+                  ],
                 ),
               ),
             Container(
