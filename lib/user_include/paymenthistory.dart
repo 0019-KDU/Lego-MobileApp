@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class PayHistoryPage extends StatelessWidget {
-  const PayHistoryPage({Key? key});
+  const PayHistoryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,9 @@ class PayHistoryPage extends StatelessWidget {
 }
 
 class PayHistoryList extends StatelessWidget {
-  const PayHistoryList({Key? key});
+  const PayHistoryList({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

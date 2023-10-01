@@ -1,171 +1,227 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:intl/intl.dart';
 import 'package:lego/admin_include/additional.dart';
 import 'package:lego/admin_include/daily_attendance.dart';
 import 'package:lego/admin_include/location_page.dart';
 import 'package:lego/admin_include/payment.dart';
 import 'package:lego/admin_include/sendnotificationscreen.dart';
-import 'package:lego/admin_include/user_count.dart';
-import 'package:lego/authentication/login.dart';
 
 class AdminPage extends StatefulWidget {
-  const AdminPage({Key? key}) : super(key: key);
+  const AdminPage({super.key});
 
   @override
   State<AdminPage> createState() => _AdminPageState();
 }
 
 class _AdminPageState extends State<AdminPage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  late BuildContext _context; // Store the context
+  var height, width;
 
-  int _currentIndex = 0; // Index for the bottom navigation bar
+  List imgSrc = [
+    "assets/att.png",
+    "assets/location.gif",
+    "assets/bubble-chat.gif",
+    "assets/notifications.gif",
+    "assets/payment-app.gif"
+  ];
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _context = context; // Store the context in didChangeDependencies
-  }
+  List titles = [
+    "ATTENDANCE",
+    "LOCATION",
+    "REQUEST",
+    "NOTIFICATION",
+    "USER PAYMENTT"
+  ];
 
   @override
   Widget build(BuildContext context) {
+    height = MediaQuery.of(context).size.height;
+    width = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        actions: [
-          IconButton(
-            onPressed: () {
-              _signOutAndNavigateToLogin(); // Use the stored context here
-            },
-            icon: const Icon(Icons.logout),
-          )
-        ],
-      ),
-      drawer: Drawer(
-        child: StreamBuilder<DocumentSnapshot>(
-          stream: _firestore
-              .collection("users")
-              .doc(_auth.currentUser?.uid)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else if (!snapshot.hasData || !snapshot.data!.exists) {
-              return const Text('No data available');
-            }
-
-            final userData = snapshot.data!.data() as Map<String, dynamic>;
-            final email = userData['email'] as String;
-            final username = userData['username'] as String;
-
-            return Column(
-              children: [
-                UserAccountsDrawerHeader(
-                  accountName: Text(username),
-                  accountEmail: Text(email),
-                  currentAccountPicture: const CircleAvatar(
-                    child: Icon(Icons.person),
+      body: SingleChildScrollView(
+        child: Container(
+          color: Colors.black,
+          width: width,
+          child: Column(
+            children: [
+              Container(
+                decoration: const BoxDecoration(),
+                height: height * 0.25,
+                width: width,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(top: 35, left: 30, right: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          InkWell(
+                            onTap: () {},
+                            child: const Icon(
+                              Icons.sort,
+                              color: Colors.white,
+                              size: 40,
+                            ),
+                          ),
+                          Container(
+                            height: 50,
+                            width: 50,
+                            decoration: const BoxDecoration(
+                                image: DecorationImage(
+                              image: AssetImage('assets/Lego.png'),
+                            )),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 20,
+                        left: 30,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Dashboard",
+                            style: TextStyle(
+                                fontSize: 35,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 1),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            DateFormat('MMMM d, y').format(DateTime.now()),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.white54,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 1,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SingleChildScrollView(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(50),
+                      topRight: Radius.circular(50),
+                    ),
+                  ),
+                  //height: height * 0.75,
+                  width: width,
+                  padding: const EdgeInsets.symmetric(vertical: 30),
+                  child: GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio:
+                                1.1, // Adjust the aspect ratio to control the box size
+                            mainAxisSpacing: 50,
+                            crossAxisSpacing: 20),
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: imgSrc.length,
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          switch (index) {
+                            case 0:
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AttendancePage([index]),
+                                ),
+                              );
+                              break;
+                            case 1:
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      RuntimeLocationDriver([index]),
+                                ),
+                              );
+                              break;
+                            case 2:
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      AdminSeatResponseScreen([index]),
+                                ),
+                              );
+                            case 3:
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      SendNotificationPage([index]),
+                                ),
+                              );
+                              break;
+                            case 4:
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PaymentDetails([index]),
+                                ),
+                              );
+                            default:
+                              break;
+                          }
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 20, // Increase the vertical padding
+                            horizontal: 30, // Increase the horizontal padding
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20.0),
+                            color: Colors.white,
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black26,
+                                spreadRadius: 1,
+                                blurRadius: 6,
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Image.asset(
+                                imgSrc[index],
+                                width: 100,
+                              ),
+                              Text(
+                                titles[index],
+                                style: const TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
-                // Add other drawer items below as needed
-                ListTile(
-                  leading: const Icon(Icons.verified_user_rounded),
-                  title: const Text('Users'),
-                  onTap: () {
-                    // Handle drawer item tap
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const UserCount(),
-                      ),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.request_quote_sharp),
-                  title: const Text('Requested'),
-                  onTap: () {
-                    // Handle drawer item tap
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const AdminSeatResponseScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-      body: _buildBody(), // Add a method to build the body content
-      bottomNavigationBar: Container(
-        color: Colors.black,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 16),
-          child: GNav(
-            backgroundColor: Colors.black,
-            color: Colors.white,
-            activeColor: Colors.white,
-            tabBackgroundColor: const Color(0xFF424242),
-            gap: 8,
-            onTabChange: (index) {
-              _onTabTapped(index); // Handle tab change
-            },
-            padding: const EdgeInsets.all(15),
-            tabs: const [
-              GButton(icon: Icons.home, text: "Home"),
-              GButton(icon: Icons.list_alt, text: "Daily Attendance"),
-              GButton(icon: Icons.location_history_sharp, text: "Location"),
-              GButton(icon: Icons.message_sharp, text: "Send message")
+              ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  Widget _buildBody() {
-    switch (_currentIndex) {
-      case 0:
-        // Home Page
-        return const PaymentDetails();
-      case 1:
-        // Daily Attendance Page
-        return const DailyAttendancePage();
-      case 2:
-        // Location Page
-        return const RuntimeLocationDriver();
-      // case 3:
-      //   // Send Message Page
-      //   return const SendNotificationPage();
-      default:
-        return const SendNotificationPage();
-    }
-  }
-
-  void _onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  }
-
-  void _signOutAndNavigateToLogin() async {
-    try {
-      await _auth.signOut();
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-        _context, // Use the stored context here
-        MaterialPageRoute(
-          builder: (context) => const LoginPage(),
-        ),
-      );
-    } catch (e) {
-      print('An error occurred while signing out: $e');
-    }
   }
 }

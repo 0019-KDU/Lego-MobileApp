@@ -2,126 +2,103 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class PaymentDetails extends StatefulWidget {
-  const PaymentDetails({Key? key}) : super(key: key);
+  const PaymentDetails(List<int> list, {super.key});
 
   @override
-  _PaymentDetailsState createState() => _PaymentDetailsState();
+  State<PaymentDetails> createState() => _PaymentDetailsState();
 }
 
 class _PaymentDetailsState extends State<PaymentDetails> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  void _approvePayment(String userName) {
+    // Implement logic to approve payment here
+    // You can update the 'status' field in Firestore
+    // and perform any additional actions if needed
+    FirebaseFirestore.instance
+        .collection('payments')
+        .where('userName', isEqualTo: userName)
+        .get()
+        .then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        doc.reference.update({'status': 'approved'});
+      });
+    });
+
+    // Notify the user that their payment has been approved
+  }
+
+  void _rejectPayment(String userName) {
+    // Implement logic to reject payment here
+    // You can update the 'status' field in Firestore
+    // and perform any additional actions if needed
+    FirebaseFirestore.instance
+        .collection('payments')
+        .where('userName', isEqualTo: userName)
+        .get()
+        .then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        doc.reference.update({'status': 'rejected'});
+      });
+    });
+
+    // Notify the user that their payment has been rejected
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Admin Screen'),
+      ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _firestore
-            .collection('details')
-            .where('pay', isEqualTo: 'pending') // Filter by pending payments
-            .snapshots(),
-        builder: (context, snapshot) {
+        stream: FirebaseFirestore.instance.collection('payments').snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          }
+
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(),
+            );
           }
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text('No pending payments found.'));
-          }
+          List<DocumentSnapshot> payments = snapshot.data!.docs;
 
-          // Display the list of pending payments
           return ListView.builder(
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              final document = snapshot.data!.docs[index];
-              final data = document.data() as Map<String, dynamic>;
-              final documentId = document.id;
-              final userId = data['userId']; // Get the user's UID
+            itemCount: payments.length,
+            itemBuilder: (BuildContext context, int index) {
+              Map<String, dynamic> data =
+                  payments[index].data() as Map<String, dynamic>;
 
-              // Fetch user information based on the UID
-              return FutureBuilder<DocumentSnapshot>(
-                future: _firestore.collection('users').doc(userId).get(),
-                builder: (context, userSnapshot) {
-                  if (userSnapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-
-                  if (!userSnapshot.hasData) {
-                    return Text('User not found');
-                  }
-
-                  final userData =
-                      userSnapshot.data!.data() as Map<String, dynamic>;
-                  final username = userData['username']; // Get the username
-
-                  return Card(
-                    elevation: 4,
-                    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    child: ListTile(
-                      title:
-                          Text('Username: $username'), // Display the username
-                      subtitle: Text('Selected Date: ${data['selected_date']}'),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.check),
-                            color: Colors.green,
-                            onPressed: () {
-                              // Approve the payment
-                              _approvePayment(documentId);
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.close),
-                            color: Colors.red,
-                            onPressed: () {
-                              // Reject the payment
-                              _rejectPayment(documentId);
-                            },
-                          ),
-                        ],
+              return Card(
+                margin: EdgeInsets.all(8.0),
+                child: ListTile(
+                  title: Text(
+                    'User: ${data['userName']}',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text('Status: ${data['status']}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.check, color: Colors.green),
+                        onPressed: () => _approvePayment(data['userName']),
                       ),
-                    ),
-                  );
-                },
+                      IconButton(
+                        icon: Icon(Icons.close, color: Colors.red),
+                        onPressed: () => _rejectPayment(data['userName']),
+                      ),
+                    ],
+                  ),
+                ),
               );
             },
           );
         },
       ),
     );
-  }
-
-  Future<void> _approvePayment(String documentId) async {
-    try {
-      await _firestore.collection('details').doc(documentId).update({
-        'pay': 'approved', // Update the payment status to 'approved'
-      });
-      // Provide feedback to the admin, e.g., show a snackbar.
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Payment approved.'),
-        ),
-      );
-    } catch (error) {
-      print('Error approving payment: $error');
-      // Handle the error, e.g., show an error message.
-    }
-  }
-
-  Future<void> _rejectPayment(String documentId) async {
-    try {
-      await _firestore.collection('details').doc(documentId).update({
-        'pay': 'rejected', // Update the payment status to 'rejected'
-      });
-      // Provide feedback to the admin, e.g., show a snackbar.
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Payment rejected.'),
-        ),
-      );
-    } catch (error) {
-      print('Error rejecting payment: $error');
-      // Handle the error, e.g., show an error message.
-    }
   }
 }

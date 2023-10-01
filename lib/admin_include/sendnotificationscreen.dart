@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class SendNotificationPage extends StatefulWidget {
-  const SendNotificationPage({super.key});
+  const SendNotificationPage(List<int> list, {super.key});
 
   @override
-  _SendNotificationPageState createState() => _SendNotificationPageState();
+  State<SendNotificationPage> createState() => _SendNotificationPageState();
 }
 
 class _SendNotificationPageState extends State<SendNotificationPage> {

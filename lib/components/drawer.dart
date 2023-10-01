@@ -1,78 +1,69 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lego/authentication/login.dart';
-import 'package:lego/components/my_list_tile.dart';
+import 'package:lego/screen/profile.dart';
 
-class Mydrawer extends StatefulWidget {
-  final void Function()? onProfileTap;
+class MyDrawer extends StatelessWidget {
+  const MyDrawer({
+    super.key,
+  });
 
-  const Mydrawer({super.key, required this.onProfileTap});
+// Function to handle the log out action
+  void logout(BuildContext context) async {
+    // Implement your log out logic here, such as clearing user session.
+    // For demonstration purposes, we'll use a Future.delayed to simulate the process.
 
-  @override
-  State<Mydrawer> createState() => _MydrawerState();
-}
+    // Simulate a delay for clearing the session (replace this with your actual logic)
+    await Future.delayed(const Duration(seconds: 1));
 
-class _MydrawerState extends State<Mydrawer> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+    // After clearing the session, navigate to the login screen.
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.black,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          //header
-          Column(
-            children: [
-              const DrawerHeader(
-                child: Icon(
-                  Icons.person,
-                  color: Colors.red, // Change the color here
-                  size: 100,
+      child: Container(
+        color: Colors.indigo.shade50,
+        child: ListView(
+          children: [
+            const DrawerHeader(
+              child: Center(
+                child: Text(
+                  "L E G O",
+                  style: TextStyle(fontSize: 32),
                 ),
               ),
-              //home list tile
-              MyListTile(
-                icon: Icons.home,
-                text: "H O M E",
-                onTap: () => Navigator.pop(context),
-              ),
-              MyListTile(
-                icon: Icons.person,
-                text: "P R O F I L E",
-                onTap: widget.onProfileTap,
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20),
-            child: MyListTile(
-              icon: Icons.logout,
-              text: "L O G O U T",
-              onTap: _signOutAndNavigateToLogin,
             ),
-          ),
-        ],
+            ListTile(
+              leading: Icon(Icons.verified_user_rounded),
+              title: const Text(
+                "User Profile",
+                style: TextStyle(fontSize: 20),
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => ProfilePage()));
+              },
+            ),
+            const SizedBox(
+              height: 70,
+            ), // This adds spacing between the previous items and the ones at the bottom
+            ListTile(
+              leading: const Icon(Icons.logout_sharp),
+              title: const Text(
+                "L O G O U T",
+                style: TextStyle(fontSize: 20),
+              ),
+              onTap: () {
+                // Implement the settings logic here
+                logout(context);
+              },
+            ),
+          ],
+        ),
       ),
     );
-  }
-
-  void _signOutAndNavigateToLogin() async {
-    try {
-      await _auth.signOut();
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-        context, // Use the context from the build method
-        MaterialPageRoute(
-          builder: (context) => const LoginPage(),
-        ),
-      );
-    } catch (e) {
-      if (kDebugMode) {
-        print('An error occurred while signing out: $e');
-      }
-    }
   }
 }

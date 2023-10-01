@@ -1,3 +1,4 @@
 {
-  "cmake.sourceDirectory": "D:/FlutterApp/lego/build/windows/extracted/firebase_cpp_sdk"
+  "cmake.sourceDirectory": "D:/FlutterApp/lego/build/windows/extracted/firebase_cpp_sdk",
+  "cSpell.words": ["autovalidate"]
 }

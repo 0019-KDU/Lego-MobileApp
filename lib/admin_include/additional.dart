@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class AdminSeatResponseScreen extends StatefulWidget {
-  const AdminSeatResponseScreen({super.key});
+  const AdminSeatResponseScreen(List<int> list, {super.key});
 
   @override
   State<AdminSeatResponseScreen> createState() => _AdminSeatResponseScreen();
