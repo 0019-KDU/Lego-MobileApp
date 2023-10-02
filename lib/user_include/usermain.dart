@@ -154,8 +154,7 @@ class _UserMainPageState extends State<UserMainPage>
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      const PassengerJourny()),
+                                  builder: (context) => const ComeGoing()),
                             );
                           },
                         ),

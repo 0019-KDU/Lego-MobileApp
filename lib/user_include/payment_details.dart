@@ -153,11 +153,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
               child: Container(
                 width: 150,
                 height: 150,
-                color: Colors.grey, // Placeholder color
-                child: _selectedImage != null
-                    ? Image.file(File(_selectedImage!.path), fit: BoxFit.cover)
-                    : const Icon(Icons.add_a_photo,
-                        size: 50, color: Colors.white),
+                decoration: BoxDecoration(
+                  color: Colors.grey, // Placeholder color
+                  borderRadius: BorderRadius.circular(10),
+                  image: _selectedImage != null
+                      ? DecorationImage(
+                          image: FileImage(File(_selectedImage!.path)),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                ),
+                child: _selectedImage == null
+                    ? Icon(Icons.add_a_photo, size: 50, color: Colors.white)
+                    : null,
               ),
             ),
             const SizedBox(height: 20),
