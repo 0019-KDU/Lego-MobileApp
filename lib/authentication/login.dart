@@ -24,6 +24,12 @@ class _LoginPageState extends State<LoginPage> {
   final _formkey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -351,9 +357,22 @@ class _LoginPageState extends State<LoginPage> {
         route();
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
-          print('No user found for that email.');
+          // Show a user-friendly message to the user
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('No user found for that email.'),
+            ),
+          );
         } else if (e.code == 'wrong-password') {
-          print('Wrong password provided for that user.');
+          // Show a user-friendly message to the user
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Wrong password provided for that user.'),
+            ),
+          );
+        } else {
+          // Handle other error codes as needed
+          print('Error: $e');
         }
       }
     }
