@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lego/user_include/attendance_history.dart';
 
 class ComeGoing extends StatefulWidget {
   const ComeGoing({super.key});
@@ -208,6 +209,24 @@ class _ComeGoingState extends State<ComeGoing> {
         child: ListView(
           children: [
             Container(
+              margin: const EdgeInsets.only(top: 18, left: 24, right: 24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(
+                      Icons.arrow_back_ios,
+                      color: Colors.indigo,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
               width: 550,
               height: 350,
               decoration: BoxDecoration(
@@ -347,6 +366,26 @@ class _ComeGoingState extends State<ComeGoing> {
                     ),
                 ],
               ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.green.shade400,
+                shadowColor: Colors.greenAccent,
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32.0),
+                ),
+                minimumSize: const Size(90, 45),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AttendanceHistoryScreen()),
+                );
+              },
+              child: const Text("History"),
             ),
           ],
         ),
