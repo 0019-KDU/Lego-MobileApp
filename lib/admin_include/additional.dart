@@ -35,7 +35,33 @@ class _AdminSeatResponseScreen extends State<AdminSeatResponseScreen> {
               // Display the request data and approve/reject buttons
               return ListTile(
                 title: Text('Requested Seats: ${request['requestedSeats']}'),
-                subtitle: Text('Purpose: ${request['purpose']}'),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Purpose: ${request['purpose']}'),
+                    FutureBuilder<DocumentSnapshot>(
+                      future: _firestore
+                          .collection('users')
+                          .doc(request['userId'])
+                          .get(),
+                      builder: (context, userSnapshot) {
+                        if (userSnapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
+                        if (!userSnapshot.hasData ||
+                            !userSnapshot.data!.exists) {
+                          return Text(
+                              'Username: User not found'); // Handle user not found
+                        }
+                        final userData =
+                            userSnapshot.data!.data() as Map<String, dynamic>;
+                        final username = userData['username'];
+                        return Text('Username: $username');
+                      },
+                    ),
+                  ],
+                ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -46,7 +72,7 @@ class _AdminSeatResponseScreen extends State<AdminSeatResponseScreen> {
                       },
                       child: const Text('Approve'),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 3,
                     ),
                     ElevatedButton(
