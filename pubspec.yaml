@@ -55,6 +55,7 @@ dependencies:
   rflutter_alert: ^2.0.7
   flutter_drawio: ^1.1.0
   rxdart: ^0.27.7
+  google_fonts: ^6.1.0
 
 dev_dependencies:
   flutter_test:

@@ -16,8 +16,10 @@ class _SendNotificationPageState extends State<SendNotificationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: WebViewWidget(
-        controller: controller, // Assign the WebViewController
+      body: SafeArea(
+        child: WebViewWidget(
+          controller: controller, // Assign the WebViewController
+        ),
       ),
     );
   }

@@ -46,6 +46,9 @@ class _AdminSeatResponseScreen extends State<AdminSeatResponseScreen> {
                       },
                       child: const Text('Approve'),
                     ),
+                    SizedBox(
+                      width: 3,
+                    ),
                     ElevatedButton(
                       onPressed: () {
                         // Reject the request (update Firestore)

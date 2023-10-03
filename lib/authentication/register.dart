@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lego/components/app_styles.dart';
 
 import 'login.dart';
 // import 'model.dart';
@@ -155,17 +156,14 @@ class _RegisterState extends State<Register> {
                         ),
                         Container(
                           alignment: Alignment.centerLeft,
-                          child: const Text(
+                          child: Text(
                             "Register Now...",
-                            style: TextStyle(
+                            style: ralewayStyle.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                               fontSize: 40,
                               // Customize font style here:
-                              fontFamily:
-                                  'YourFontFamily', // Change to your desired font family
-                              fontStyle: FontStyle
-                                  .italic, // Change to your desired font style
+                              // Change to your desired font style
                               letterSpacing:
                                   2.0, // Change to your desired letter spacing
                             ),
@@ -478,8 +476,7 @@ class _RegisterState extends State<Register> {
                             MaterialButton(
                               shape: const RoundedRectangleBorder(
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(12.0))),
-                              elevation: 5.0,
+                                      BorderRadius.all(Radius.circular(15.0))),
                               height: 40,
                               onPressed: () {
                                 setState(() {
@@ -514,16 +511,16 @@ class _RegisterState extends State<Register> {
                               );
                             },
                             child: RichText(
-                              text: const TextSpan(
+                              text: TextSpan(
                                 text: "You already have an account? ",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 15,
                                 ),
                                 children: <TextSpan>[
                                   TextSpan(
                                     text: "Login",
-                                    style: TextStyle(
+                                    style: ralewayStyle.copyWith(
                                         color: Colors
                                             .greenAccent, // Change the color to your desired color
                                         fontSize: 20,
@@ -533,9 +530,6 @@ class _RegisterState extends State<Register> {
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 20,
                         ),
                       ],
                     ),
