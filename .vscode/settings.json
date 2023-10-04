@@ -1,4 +1,8 @@
 {
+<<<<<<< Updated upstream
   "cmake.sourceDirectory": "C:/Users/dilshan/Documents/GitHub/Lego-MobileApp/linux",
+=======
+  "cmake.sourceDirectory": "D:/FlutterApp/lego/windows/runner",
+>>>>>>> Stashed changes
   "cSpell.words": ["autovalidate"]
 }
