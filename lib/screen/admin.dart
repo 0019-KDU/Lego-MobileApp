@@ -140,7 +140,7 @@ class _AdminPageState extends State<AdminPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => AttendancePage([index]),
+                                  builder: (context) => ComeGoing([index]),
                                 ),
                               );
                               break;

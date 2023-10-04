@@ -3,250 +3,117 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class AttendanceHistory extends StatefulWidget {
-  const AttendanceHistory({Key? key}) : super(key: key);
+class AttendanceHistoryScreen extends StatefulWidget {
+  const AttendanceHistoryScreen({Key? key}) : super(key: key);
 
   @override
-  State<AttendanceHistory> createState() => _AttendanceHistoryState();
+  _AttendanceHistoryScreenState createState() =>
+      _AttendanceHistoryScreenState();
 }
 
-class _AttendanceHistoryState extends State<AttendanceHistory> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  // Define variables for pagination
-  int documentsPerPage = 10;
-  DocumentSnapshot? lastVisibleDocument;
-  List<DataRow> dataRows = [];
-
-  Future<String?> getCurrentUserUid() async {
-    User? user = _auth.currentUser;
-    if (user != null) {
-      return user.uid;
-    }
-    return null; // If the user is not logged in
-  }
-
+class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Attendance History',
-          style: TextStyle(fontSize: 20.0), // Increase font size for title
-        ),
+        title: const Text("Attendance History"),
       ),
-      body: FutureBuilder<String?>(
-        future: getCurrentUserUid(),
-        builder: (context, uidSnapshot) {
-          if (uidSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (uidSnapshot.hasError) {
-            return Text(
-              'Error: ${uidSnapshot.error}',
-              style: const TextStyle(
-                  fontSize: 16.0), // Increase font size for error text
-            );
-          }
-          final currentUserUid = uidSnapshot.data;
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection("going_values")
+            .where("userId", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .orderBy("timestamp", descending: true)
+            .snapshots(),
+        builder: (context, goingSnapshot) {
+          if (goingSnapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (goingSnapshot.hasError) {
+            return Text('Error: ${goingSnapshot.error}');
+          } else {
+            final List<QueryDocumentSnapshot> goingData =
+                goingSnapshot.data!.docs;
+            return StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection("coming_values")
+                  .where(
+                    "userId",
+                    isEqualTo: FirebaseAuth.instance.currentUser!.uid,
+                  )
+                  .orderBy("timestamp", descending: true)
+                  .snapshots(),
+              builder: (context, comingSnapshot) {
+                if (comingSnapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else if (comingSnapshot.hasError) {
+                  return Text('Error: ${comingSnapshot.error}');
+                } else {
+                  final List<QueryDocumentSnapshot> comingData =
+                      comingSnapshot.data!.docs;
 
-          if (currentUserUid == null) {
-            return const Center(
-              child: Text(
-                'User not logged in.',
-                style:
-                    TextStyle(fontSize: 16.0), // Increase font size for message
-              ),
-            );
-          }
+                  // Combine both going and coming attendance data
+                  final List<QueryDocumentSnapshot> combinedData = [
+                    ...goingData,
+                    ...comingData
+                  ];
+                  combinedData.sort((a, b) {
+                    final aTimestamp = (a['timestamp'] as Timestamp?)?.toDate();
+                    final bTimestamp = (b['timestamp'] as Timestamp?)?.toDate();
+                    return bTimestamp?.compareTo(aTimestamp ?? DateTime(0)) ??
+                        0;
+                  });
 
-          return StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection("selected_values")
-                .where("userId",
-                    isEqualTo: currentUserUid) // Filter by userId (UID)
-                .orderBy("timestamp", descending: true) // Sort by timestamp
-                .limit(documentsPerPage) // Load the first batch of documents
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              if (snapshot.hasError) {
-                return Text(
-                  'Error: ${snapshot.error}',
-                  style: const TextStyle(
-                      fontSize: 16.0), // Increase font size for error text
-                );
-              }
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return const Center(
-                  child: Text(
-                    'No attendance data available for the current user.',
-                    style: TextStyle(
-                        fontSize: 16.0), // Increase font size for message
-                  ),
-                );
-              }
+                  return ListView.builder(
+                    itemCount: combinedData.length,
+                    itemBuilder: (context, index) {
+                      final document = combinedData[index];
+                      final selectedValue =
+                          document['selectedValue'] as String?;
+                      final timestamp = document['timestamp'] as Timestamp?;
 
-              // Extract "selectedValue" and "timestamp" from documents
-              List<String> selectedValues = [];
-              List<Timestamp> timestampList = [];
+                      if (selectedValue == null || timestamp == null) {
+                        return const ListTile(
+                          title: Text('Data not available'),
+                          subtitle: Text('Date: Unknown'),
+                        );
+                      }
 
-              if (snapshot.hasData && snapshot.data != null) {
-                selectedValues = snapshot.data!.docs
-                    .map((doc) => doc["selectedValue"].toString())
-                    .toList();
+                      final isGoingCollection =
+                          document.reference.parent!.id == 'going_values';
 
-                timestampList = snapshot.data!.docs
-                    .map((doc) => doc["timestamp"] as Timestamp?)
-                    .where((timestamp) =>
-                        timestamp != null) // Filter out null timestamps
-                    .map(
-                        (timestamp) => timestamp!) // Unwrap non-null timestamps
-                    .toList();
-              }
+                      IconData icon;
+                      Color iconColor;
+                      String title;
 
-              // Ensure that the lengths match (selectedValues and timestampList)
-              assert(selectedValues.length == timestampList.length);
+                      if (isGoingCollection) {
+                        icon = Icons.arrow_forward;
+                        iconColor = Colors.green;
+                        title = 'Going - $selectedValue';
+                      } else {
+                        icon = Icons.arrow_back;
+                        iconColor = Colors.blue;
+                        title = 'Coming - $selectedValue';
+                      }
 
-              // Create a list of DataRow widgets for the DataTable
-              List<DataRow> dataRows =
-                  selectedValues.asMap().entries.map((entry) {
-                int index = entry.key;
-                String selectedValue = entry.value;
+                      final date = timestamp.toDate();
+                      final formattedDate =
+                          DateFormat('yyyy-MM-dd HH:mm').format(date);
 
-                // Check if the index is valid for timestampList
-                if (index >= 0 && index < timestampList.length) {
-                  DateTime timestamp = timestampList[index].toDate();
-
-                  // Format the timestamp as a human-readable string
-                  String formattedTimestamp =
-                      DateFormat('MMM d, yyyy HH:mm:ss').format(timestamp);
-
-                  return DataRow(
-                    cells: [
-                      DataCell(
-                        Text(
-                          selectedValue,
-                          style: const TextStyle(
-                              fontSize:
-                                  18.0), // Increase font size for selectedValue
+                      return ListTile(
+                        title: Text(title),
+                        subtitle: Text('Date: $formattedDate'),
+                        leading: Icon(
+                          icon,
+                          color: iconColor,
                         ),
-                      ),
-                      DataCell(
-                        Text(
-                          formattedTimestamp,
-                          style: const TextStyle(
-                              fontSize:
-                                  18.0), // Increase font size for timestamp
-                        ),
-                      ),
-                    ],
+                      );
+                    },
                   );
                 }
-
-                return const DataRow(cells: []);
-              }).toList();
-
-              return Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                        columns: const [
-                          DataColumn(
-                            label: Text(
-                              'Selected Value',
-                              style: TextStyle(
-                                  fontSize:
-                                      18.0), // Increase font size for DataColumn label
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Timestamp',
-                              style: TextStyle(
-                                  fontSize:
-                                      18.0), // Increase font size for DataColumn label
-                            ),
-                          ),
-                        ],
-                        rows: dataRows,
-                      ),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Load the next page of data
-                      loadMoreData(currentUserUid);
-                    },
-                    child: const Text("Load More"),
-                  ),
-                ],
-              );
-            },
-          );
+              },
+            );
+          }
         },
       ),
     );
-  }
-
-  Future<void> loadMoreData(String? userId) async {
-    final query = FirebaseFirestore.instance
-        .collection("selected_values")
-        .where("userId", isEqualTo: userId)
-        .orderBy("timestamp", descending: true)
-        .limit(documentsPerPage);
-
-    if (lastVisibleDocument != null) {
-      query.startAfterDocument(lastVisibleDocument!);
-    }
-
-    final newSnapshot = await query.get();
-
-    // Update the last visible document for the next load
-    if (newSnapshot.docs.isNotEmpty) {
-      lastVisibleDocument = newSnapshot.docs.last;
-    }
-
-    // Add the new data to the existing list
-    final newData = newSnapshot.docs.map((doc) {
-      final selectedValue = doc["selectedValue"].toString();
-      final timestamp = doc["timestamp"] as Timestamp?;
-
-      // Check if the timestamp is not null before casting
-      final formattedTimestamp = timestamp != null
-          ? DateFormat('MMM d, yyyy HH:mm:ss').format(timestamp.toDate())
-          : "N/A"; // Provide a default value or handle the null case
-
-      return DataRow(
-        cells: [
-          DataCell(
-            Text(
-              selectedValue,
-              style: const TextStyle(fontSize: 18.0),
-            ),
-          ),
-          DataCell(
-            Text(
-              formattedTimestamp,
-              style: const TextStyle(fontSize: 18.0),
-            ),
-          ),
-        ],
-      );
-    }).toList();
-
-    // Update the dataRows list with the new data
-    dataRows.addAll(newData);
-
-    // Trigger a rebuild of the widget
-    setState(() {});
   }
 }
