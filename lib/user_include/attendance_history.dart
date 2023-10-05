@@ -7,7 +7,7 @@ class AttendanceHistoryScreen extends StatefulWidget {
   const AttendanceHistoryScreen({Key? key}) : super(key: key);
 
   @override
-  _AttendanceHistoryScreenState createState() =>
+  State<AttendanceHistoryScreen> createState() =>
       _AttendanceHistoryScreenState();
 }
 

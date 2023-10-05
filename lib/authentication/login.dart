@@ -9,6 +9,7 @@ import 'package:lego/components/responsive_widget.dart';
 import 'package:lego/screen/admin.dart';
 import 'package:lego/screen/driver.dart';
 import 'package:lego/user_include/usermain.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,6 +19,26 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  @override
+  void initState() {
+    super.initState();
+    checkLoggedInStatus();
+  }
+
+  void checkLoggedInStatus() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+    if (isLoggedIn) {
+      // User is already logged in, navigate to the home page
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const UserMainPage(), // or any other home page
+        ),
+      );
+    }
+  }
+
   bool _isObscure3 = true;
   bool visible = false;
   bool _isLoading = false;
@@ -65,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
                             TextSpan(
                                 text: 'Let’s',
                                 style: ralewayStyle.copyWith(
-                                  fontSize: 25.0,
+                                  fontSize: 30.0,
                                   color: AppColors.blueDarkColor,
                                   fontWeight: FontWeight.normal,
                                 )),
@@ -74,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
                               style: ralewayStyle.copyWith(
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.blueDarkColor,
-                                fontSize: 25.0,
+                                fontSize: 30.0,
                               ),
                             ),
                           ],
@@ -84,14 +105,14 @@ class _LoginPageState extends State<LoginPage> {
                       Text(
                         'Hey, Enter your details to get sign in \nto your account.',
                         style: ralewayStyle.copyWith(
-                          fontSize: 12.0,
+                          fontSize: 15.0,
                           fontWeight: FontWeight.w400,
                           color: AppColors.textColor,
                         ),
                       ),
                       SizedBox(height: height * 0.064),
                       Padding(
-                        padding: const EdgeInsets.only(left: 1.0),
+                        padding: const EdgeInsets.only(left: 0.0),
                         child: Form(
                           key: _formkey,
                           child: Column(
@@ -116,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   enabled: true,
                                   prefixIcon: const Icon(
-                                    Icons.man,
+                                    Icons.email_sharp,
                                     color: Colors.black,
                                     size: 18,
                                   ),
@@ -308,15 +329,17 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void route() {
+  void route() async {
     User? user = FirebaseAuth.instance.currentUser;
     var kk = FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
         .get()
-        .then((DocumentSnapshot documentSnapshot) {
+        .then((DocumentSnapshot documentSnapshot) async {
       if (documentSnapshot.exists) {
         if (documentSnapshot.get('rool') == "admin") {
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setBool('isLoggedIn', true);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -324,6 +347,9 @@ class _LoginPageState extends State<LoginPage> {
             ),
           );
         } else if ((documentSnapshot.get('rool') == "driver")) {
+          // Save login status to SharedPreferences
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setBool('isLoggedIn', true);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -331,6 +357,9 @@ class _LoginPageState extends State<LoginPage> {
             ),
           );
         } else {
+          // Save login status to SharedPreferences
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setBool('isLoggedIn', true);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -354,6 +383,9 @@ class _LoginPageState extends State<LoginPage> {
           email: email,
           password: password,
         );
+        // Set the isLoggedIn flag to true
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('isLoggedIn', true);
         route();
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {

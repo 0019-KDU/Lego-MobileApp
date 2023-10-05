@@ -78,6 +78,12 @@ class _ComeGoingState extends State<ComeGoing> {
 
   Future<void> _editSelectedValue() async {
     try {
+      if (tripType == null) {
+        _showDialog(
+            "Warning", "Please select a trip type (Going or Coming) first.");
+        return;
+      }
+
       String? selectedValue = existsSelected ??
           _existPoints
               .first; // Initialize with the current value or the first item
