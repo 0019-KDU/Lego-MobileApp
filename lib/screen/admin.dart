@@ -5,6 +5,7 @@ import 'package:lego/admin_include/daily_attendance.dart';
 import 'package:lego/admin_include/location_page.dart';
 import 'package:lego/admin_include/payment.dart';
 import 'package:lego/admin_include/sendnotificationscreen.dart';
+import 'package:lego/authentication/auth_helper.dart';
 
 class AdminPage extends StatefulWidget {
   const AdminPage({super.key});
@@ -57,11 +58,13 @@ class _AdminPageState extends State<AdminPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              AuthHelper.instance.logout(context);
+                            },
                             child: const Icon(
-                              Icons.sort,
+                              Icons.logout_rounded,
                               color: Colors.white,
-                              size: 40,
+                              size: 35,
                             ),
                           ),
                           Container(
@@ -166,7 +169,7 @@ class _AdminPageState extends State<AdminPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      SendNotificationPage([index]),
+                                      SenNotification([index]),
                                 ),
                               );
                               break;

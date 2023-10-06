@@ -25,13 +25,14 @@ class _AdminSeatResponseScreenState extends State<AdminSeatResponseScreen> {
     requestsData =
         snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
 
-    // Initialize approval status for each request
-    for (final request in requestsData) {
-      final requestId = request['requestId'] as String?;
-      if (requestId != null) {
-        approvalStatus[requestId] = false; // Set to false initially
-      }
-    }
+    // Initialize approvalStatus map for all valid requests
+    approvalStatus = Map.fromIterable(
+      requestsData
+          .where((request) => request['requestId'] != null)
+          .map((request) => request['requestId'] as String),
+      key: (requestId) => requestId,
+      value: (_) => false, // Set all requests to false initially
+    );
 
     setState(() {});
   }
@@ -168,7 +169,7 @@ class _AdminSeatResponseScreenState extends State<AdminSeatResponseScreen> {
                                                   true; // Set to true after rejection
                                             });
                                           }
-                                        : null, // Set onPressed to null when already approved
+                                        : null, // Set onPressed to null when already rejected
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.red,
                                     ),

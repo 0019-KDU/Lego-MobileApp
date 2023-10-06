@@ -177,6 +177,7 @@ class _RegisterState extends State<Register> {
                         ),
                         TextFormField(
                           controller: userNameController,
+                          textInputAction: TextInputAction.next,
                           cursorColor: Colors.black,
                           decoration: InputDecoration(
                             filled: true, // Ensure the background is filled

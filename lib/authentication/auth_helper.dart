@@ -24,4 +24,10 @@ class AuthHelper {
       MaterialPageRoute(builder: (context) => const LoginPage()),
     );
   }
+
+  Future<bool> isUserLoggedIn() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    return isLoggedIn;
+  }
 }
