@@ -1,12 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:lego/components/app_styles.dart';
 
 class ComeGoing extends StatefulWidget {
   const ComeGoing(List<int> list, {Key? key}) : super(key: key);
 
   @override
-  State<ComeGoing> createState() => _ComeGoingState();
+  _ComeGoingState createState() => _ComeGoingState();
 }
 
 class _ComeGoingState extends State<ComeGoing> {
@@ -45,6 +44,14 @@ class _ComeGoingState extends State<ComeGoing> {
     goingDestinationCounts = _countDestinations(goingDocs);
     comingDestinationCounts = _countDestinations(comingDocs);
 
+    // Calculate and add total counts
+    final int totalGoingCount =
+        goingDestinationCounts.values.fold(0, (a, b) => a + b);
+    final int totalComingCount =
+        comingDestinationCounts.values.fold(0, (a, b) => a + b);
+    goingDestinationCounts['Total'] = totalGoingCount;
+    comingDestinationCounts['Total'] = totalComingCount;
+
     setState(() {}); // Trigger a rebuild to display the counts
   }
 
@@ -65,39 +72,25 @@ class _ComeGoingState extends State<ComeGoing> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Container(
-          margin: const EdgeInsets.only(top: 18, left: 24, right: 24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Icon(
-                      Icons.arrow_back_ios,
-                      color: Colors.indigo,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _buildDestinationCountSection(
-                "Going Destination Counts (Current Week):",
-                goingDestinationCounts,
-              ),
-              const SizedBox(height: 20),
-              _buildDestinationCountSection(
-                "Coming Destination Counts (Current Week):",
-                comingDestinationCounts,
-              ),
-            ],
-          ),
+      appBar: AppBar(
+        title: const Text('Destination Counts'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: [
+            _buildDestinationCountSection(
+              "Going Destination Counts (Current Week):",
+              goingDestinationCounts,
+            ),
+            const SizedBox(height: 20),
+            _buildDestinationCountSection(
+              "Coming Destination Counts (Current Week):",
+              comingDestinationCounts,
+            ),
+            const SizedBox(height: 20),
+            _buildTotalCountSection(),
+          ],
         ),
       ),
     );
@@ -107,53 +100,90 @@ class _ComeGoingState extends State<ComeGoing> {
     String title,
     Map<String, int> destinationCounts,
   ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: ralewayStyle.copyWith(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+    return Card(
+      elevation: 3,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: destinationCounts.entries.map((entry) {
+                return _buildDestinationCountCard(entry.key, entry.value);
+              }).toList(),
+            ),
+          ],
         ),
-        const SizedBox(height: 10),
-        ListView.builder(
-          shrinkWrap: true,
-          itemCount: destinationCounts.length,
-          itemBuilder: (context, index) {
-            final entry = destinationCounts.entries.elementAt(index);
-            return _buildDestinationCountCard(entry.key, entry.value);
-          },
+      ),
+    );
+  }
+
+  Widget _buildTotalCountSection() {
+    final totalGoingCount = goingDestinationCounts['Total'] ?? 0;
+    final totalComingCount = comingDestinationCounts['Total'] ?? 0;
+    final grandTotal = totalGoingCount + totalComingCount;
+
+    return Card(
+      elevation: 3,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Total Destination Counts:",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            _buildTotalCountCard("Going Total", totalGoingCount),
+            _buildTotalCountCard("Coming Total", totalComingCount),
+            const Divider(),
+            _buildTotalCountCard("Grand Total", grandTotal),
+          ],
         ),
-      ],
+      ),
+    );
+  }
+
+  Widget _buildTotalCountCard(String title, int count) {
+    return ListTile(
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      trailing: Text(
+        "Count: $count",
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
     );
   }
 
   Widget _buildDestinationCountCard(String destination, int count) {
-    return Card(
-      elevation: 3,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              destination,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              "Count: $count",
-              style: const TextStyle(
-                fontSize: 16,
-              ),
-            ),
-          ],
+    return ListTile(
+      title: Text(
+        destination,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
         ),
+      ),
+      trailing: Text(
+        "Count: $count",
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
     );
   }
