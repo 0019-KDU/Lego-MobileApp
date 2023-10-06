@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lego/components/drawer.dart';
 import 'package:lego/user_include/exit_comeing.dart';
+import 'package:lego/user_include/location.dart';
 import 'package:lego/user_include/option.dart';
 import 'package:lego/user_include/payment_details.dart';
 
@@ -165,6 +166,11 @@ class _UserMainPageState extends State<UserMainPage>
                           icon: 'assets/map.png',
                           onTap: () {
                             // Handle the LOCATION card onTap action
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Location()),
+                            );
                           },
                         ),
                       ],

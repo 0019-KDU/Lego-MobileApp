@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lego/user_include/usermap.dart';
 
 class Location extends StatefulWidget {
   const Location({super.key});
@@ -10,6 +11,6 @@ class Location extends StatefulWidget {
 class _LocationState extends State<Location> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return const UserMapPage();
   }
 }
