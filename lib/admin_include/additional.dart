@@ -54,140 +54,95 @@ class _AdminSeatResponseScreenState extends State<AdminSeatResponseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.indigo,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: _firestore.collection('seat_requests').snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
+      appBar: AppBar(
+        title: const Text('Admin Seat Response'),
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _firestore.collection('seat_requests').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          final requests = snapshot.data!.docs;
+
+          return ListView.builder(
+            itemCount: requests.length,
+            itemBuilder: (context, index) {
+              final request = requests[index].data() as Map<String, dynamic>;
+              final requestId = requests[index].id;
+              final userId = request['userId'] as String?;
+              String username = 'Username: User not found'; // Default value
+
+              return FutureBuilder<String?>(
+                future: fetchUsername(userId),
+                builder: (context, usernameSnapshot) {
+                  if (usernameSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const CircularProgressIndicator(
+                      strokeWidth: 1,
                     );
                   }
 
-                  final requests = snapshot.data!.docs;
+                  if (usernameSnapshot.hasError) {
+                    // Handle the error case if needed
+                    return Text('Error: ${usernameSnapshot.error}');
+                  }
 
-                  return ListView.builder(
-                    itemCount: requests.length,
-                    itemBuilder: (context, index) {
-                      final request =
-                          requests[index].data() as Map<String, dynamic>;
-                      final requestId = requests[index].id;
-                      final userId = request['userId'] as String?;
-                      String username =
-                          'Username: User not found'; // Default value
+                  if (usernameSnapshot.data != null) {
+                    username = 'Username: ${usernameSnapshot.data}';
+                  }
 
-                      return FutureBuilder<String?>(
-                        future: fetchUsername(userId),
-                        builder: (context, usernameSnapshot) {
-                          if (usernameSnapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const CircularProgressIndicator(
-                              strokeWidth: 1,
-                            );
-                          }
-
-                          if (usernameSnapshot.hasError) {
-                            // Handle the error case if needed
-                            return Text('Error: ${usernameSnapshot.error}');
-                          }
-
-                          if (usernameSnapshot.data != null) {
-                            username = 'Username: ${usernameSnapshot.data}';
-                          }
-
-                          return Card(
-                            margin: const EdgeInsets.all(8),
-                            elevation: 3,
-                            child: ListTile(
-                              title: Text(
-                                  'Requested Seats: ${request['requestedSeats']}'),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Purpose: ${request['purpose']}'),
-                                  Text(username),
-                                ],
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: approvalStatus[requestId] ==
-                                            false
-                                        ? () {
-                                            // Approve the request (update Firestore)
-                                            _updateRequestStatus(
-                                                requestId, 'approved');
-                                            _showFeedback('Request approved');
-                                            setState(() {
-                                              approvalStatus[requestId] =
-                                                  true; // Set to true after approval
-                                            });
-                                          }
-                                        : null, // Set onPressed to null when already approved
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.green,
-                                    ),
-                                    child: const Text('Approve'),
-                                  ),
-                                  const SizedBox(
-                                    width: 3,
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: approvalStatus[requestId] ==
-                                            false
-                                        ? () {
-                                            // Reject the request (update Firestore)
-                                            _updateRequestStatus(
-                                                requestId, 'rejected');
-                                            _showFeedback('Request rejected');
-                                            setState(() {
-                                              approvalStatus[requestId] =
-                                                  true; // Set to true after rejection
-                                            });
-                                          }
-                                        : null, // Set onPressed to null when already rejected
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.red,
-                                    ),
-                                    child: const Text('Reject'),
-                                  ),
-                                ],
-                              ),
+                  return Card(
+                    margin: const EdgeInsets.all(8),
+                    elevation: 3,
+                    child: ListTile(
+                      title:
+                          Text('Requested Seats: ${request['requestedSeats']}'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Purpose: ${request['purpose']}'),
+                          Text(username),
+                        ],
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              _updateRequestStatus(requestId, 'approved');
+                              _showFeedback('Request approved');
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
                             ),
-                          );
-                        },
-                      );
-                    },
+                            child: const Text('Approve'),
+                          ),
+                          const SizedBox(
+                            width: 3,
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              _updateRequestStatus(requestId, 'rejected');
+                              _showFeedback('Request rejected');
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                            ),
+                            child: const Text('Reject'),
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 },
-              ),
-            ),
-          ],
-        ),
+              );
+            },
+          );
+        },
       ),
     );
   }

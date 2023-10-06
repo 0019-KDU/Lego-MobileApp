@@ -14,9 +14,14 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
   String purpose = '';
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final TextEditingController _purposeController =
+      TextEditingController(); // Step 1
 
   @override
   Widget build(BuildContext context) {
+    final user = _auth.currentUser;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Request Additional Seats'),
@@ -88,8 +93,6 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
                 ),
               ),
               onPressed: () async {
-                final user = _auth.currentUser;
-
                 if (user == null) {
                   // User is not authenticated
                   return;
@@ -98,9 +101,7 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
                 final lastRequest = await getLastRequest(user.uid);
 
                 if (lastRequest == null ||
-                    canMakeNewRequest(
-                      lastRequest['timestamp'],
-                    )) {
+                    canMakeNewRequest(lastRequest['timestamp'])) {
                   await submitRequest(user.uid, requestedSeats, purpose);
 
                   // Clear the input fields
@@ -108,6 +109,13 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
                     requestedSeats = 1;
                     purpose = '';
                   });
+
+                  // Show a snackbar indicating the request is pending
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Request submitted and pending.'),
+                    ),
+                  );
                 } else {
                   // User cannot make a new request
                   showDialog(
@@ -148,14 +156,19 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
                 ),
               ),
               onPressed: () async {
-                final user = _auth.currentUser;
-
                 if (user == null) {
                   // User is not authenticated
                   return;
                 }
 
                 await deleteRequest(user.uid);
+
+                // Show a snackbar indicating the request is deleted
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Request deleted.'),
+                  ),
+                );
               },
               child: const Padding(
                 padding: EdgeInsets.symmetric(
@@ -163,6 +176,46 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
                   horizontal: 20.0,
                 ),
                 child: Text('Delete Request'),
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Display user requests and admin responses
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('seat_requests')
+                    .where('userId', isEqualTo: user?.uid)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // Show a loading indicator while data is loading
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    // Handle error
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    // Handle case when no data is available
+                    return Text('No seat requests found.');
+                  } else {
+                    // Display user requests and admin responses
+                    final documents = snapshot.data!.docs;
+                    return ListView.builder(
+                      itemCount: documents.length,
+                      itemBuilder: (context, index) {
+                        final documentData =
+                            documents[index].data() as Map<String, dynamic>;
+                        final adminResponse = documentData['status'] ??
+                            'Pending'; // Default to 'Pending' if field doesn't exist
+                        return ListTile(
+                          title: Text(
+                              'Requested Seats: ${documentData['requestedSeats']}'),
+                          subtitle: Text('Purpose: ${documentData['purpose']}'),
+                          trailing: Text('Admin Response: $adminResponse'),
+                        );
+                      },
+                    );
+                  }
+                },
               ),
             ),
           ],
@@ -203,13 +256,18 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
   }
 
   Future<void> deleteRequest(String userId) async {
-    final userRequests = await _firestore
-        .collection('seat_requests')
-        .where('userId', isEqualTo: userId)
-        .get();
+    try {
+      final userRequests = await _firestore
+          .collection('seat_requests')
+          .where('userId', isEqualTo: userId)
+          .get();
 
-    for (final request in userRequests.docs) {
-      await request.reference.delete();
+      for (final request in userRequests.docs) {
+        await request.reference.delete();
+      }
+    } catch (e) {
+      print("Error deleting request: $e");
+      // Handle the error here, e.g., display an error message to the user.
     }
   }
 }
