@@ -5,11 +5,50 @@ class AdminSeatResponseScreen extends StatefulWidget {
   const AdminSeatResponseScreen(List<int> list, {Key? key}) : super(key: key);
 
   @override
-  State<AdminSeatResponseScreen> createState() => _AdminSeatResponseScreen();
+  State<AdminSeatResponseScreen> createState() =>
+      _AdminSeatResponseScreenState();
 }
 
-class _AdminSeatResponseScreen extends State<AdminSeatResponseScreen> {
+class _AdminSeatResponseScreenState extends State<AdminSeatResponseScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  List<Map<String, dynamic>> requestsData = [];
+  Map<String, bool> approvalStatus = {};
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    final snapshot = await _firestore.collection('seat_requests').get();
+    requestsData =
+        snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+
+    // Initialize approval status for each request
+    for (final request in requestsData) {
+      final requestId = request['requestId'] as String?;
+      if (requestId != null) {
+        approvalStatus[requestId] = false; // Set to false initially
+      }
+    }
+
+    setState(() {});
+  }
+
+  Future<String?> fetchUsername(String? userId) async {
+    if (userId == null) {
+      return null;
+    }
+
+    final userSnapshot = await _firestore.collection('users').doc(userId).get();
+
+    if (userSnapshot.exists) {
+      return userSnapshot.data()?['username'];
+    } else {
+      return null; // User not found
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +72,7 @@ class _AdminSeatResponseScreen extends State<AdminSeatResponseScreen> {
                         color: Colors.indigo,
                       ),
                     ),
-                  ), // Add other widgets or buttons here if needed
+                  ),
                 ],
               ),
             ),
@@ -41,7 +80,7 @@ class _AdminSeatResponseScreen extends State<AdminSeatResponseScreen> {
               child: StreamBuilder<QuerySnapshot>(
                 stream: _firestore.collection('seat_requests').snapshots(),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
@@ -54,56 +93,92 @@ class _AdminSeatResponseScreen extends State<AdminSeatResponseScreen> {
                     itemBuilder: (context, index) {
                       final request =
                           requests[index].data() as Map<String, dynamic>;
-                      final requestId = snapshot.data!.docs[index].id;
-
-                      // Check if user data is available
+                      final requestId = requests[index].id;
                       final userId = request['userId'] as String?;
-                      final username = userId != null
-                          ? 'Username: ${request['username']}'
-                          : 'Username: User not found';
+                      String username =
+                          'Username: User not found'; // Default value
 
-                      return Card(
-                        margin: const EdgeInsets.all(8),
-                        elevation: 3,
-                        child: ListTile(
-                          title: Text(
-                              'Requested Seats: ${request['requestedSeats']}'),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Purpose: ${request['purpose']}'),
-                              Text(username),
-                            ],
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Approve the request (update Firestore)
-                                  _updateRequestStatus(requestId, 'approved');
-                                  _showFeedback('Request approved');
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green),
-                                child: const Text('Approve'),
+                      return FutureBuilder<String?>(
+                        future: fetchUsername(userId),
+                        builder: (context, usernameSnapshot) {
+                          if (usernameSnapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const CircularProgressIndicator(
+                              strokeWidth: 1,
+                            );
+                          }
+
+                          if (usernameSnapshot.hasError) {
+                            // Handle the error case if needed
+                            return Text('Error: ${usernameSnapshot.error}');
+                          }
+
+                          if (usernameSnapshot.data != null) {
+                            username = 'Username: ${usernameSnapshot.data}';
+                          }
+
+                          return Card(
+                            margin: const EdgeInsets.all(8),
+                            elevation: 3,
+                            child: ListTile(
+                              title: Text(
+                                  'Requested Seats: ${request['requestedSeats']}'),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Purpose: ${request['purpose']}'),
+                                  Text(username),
+                                ],
                               ),
-                              const SizedBox(
-                                width: 3,
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: approvalStatus[requestId] ==
+                                            false
+                                        ? () {
+                                            // Approve the request (update Firestore)
+                                            _updateRequestStatus(
+                                                requestId, 'approved');
+                                            _showFeedback('Request approved');
+                                            setState(() {
+                                              approvalStatus[requestId] =
+                                                  true; // Set to true after approval
+                                            });
+                                          }
+                                        : null, // Set onPressed to null when already approved
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                    ),
+                                    child: const Text('Approve'),
+                                  ),
+                                  const SizedBox(
+                                    width: 3,
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: approvalStatus[requestId] ==
+                                            false
+                                        ? () {
+                                            // Reject the request (update Firestore)
+                                            _updateRequestStatus(
+                                                requestId, 'rejected');
+                                            _showFeedback('Request rejected');
+                                            setState(() {
+                                              approvalStatus[requestId] =
+                                                  true; // Set to true after rejection
+                                            });
+                                          }
+                                        : null, // Set onPressed to null when already approved
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                    ),
+                                    child: const Text('Reject'),
+                                  ),
+                                ],
                               ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Reject the request (update Firestore)
-                                  _updateRequestStatus(requestId, 'rejected');
-                                  _showFeedback('Request rejected');
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red),
-                                child: const Text('Reject'),
-                              ),
-                            ],
-                          ),
-                        ),
+                            ),
+                          );
+                        },
                       );
                     },
                   );

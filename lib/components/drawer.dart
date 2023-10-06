@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lego/authentication/auth_helper.dart';
+import 'package:lego/screen/profile.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({
@@ -20,23 +21,19 @@ class MyDrawer extends StatelessWidget {
                 image: AssetImage('assets/Lego.png'),
               ),
             ),
-            child: Stack(
-              children: [
-                Positioned(
-                  bottom: 8.0,
-                  left: 4.0,
-                  child: Text(
-                    "",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                )
-              ],
-            ),
+            child: null,
           ),
           ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text("Home"),
-            onTap: () {},
+            leading: const Icon(Icons.verified_user),
+            title: const Text("User Profile"),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfilePage(),
+                ),
+              );
+            },
           ),
           ListTile(
             leading: const Icon(Icons.info_outline_rounded),

@@ -90,12 +90,14 @@ class _UserMainPageState extends State<UserMainPage>
                   const SizedBox(
                     width: 8,
                   ),
-                  Text(
-                    'HI $userName ',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      color: Colors.indigo,
-                      fontWeight: FontWeight.bold,
+                  Flexible(
+                    child: Text(
+                      'HI $userName ',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.indigo,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -138,7 +140,7 @@ class _UserMainPageState extends State<UserMainPage>
                     const Text(
                       "SERVICE",
                       style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(
                       height: 16,
@@ -220,10 +222,10 @@ class _UserMainPageState extends State<UserMainPage>
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        width: 190,
         padding: const EdgeInsets.symmetric(
           vertical: 30,
         ),
-        width: 190,
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(24),
