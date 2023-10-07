@@ -1,11 +1,9 @@
 import 'dart:async';
 
-import 'package:firebase_database/firebase_database.dart'; // Import Firebase Realtime Database package
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-
-
 
 class DriverPage extends StatefulWidget {
   const DriverPage({Key? key}) : super(key: key);
@@ -41,11 +39,8 @@ class _DriverPageState extends State<DriverPage> {
       _currentLocation = location;
     });
     _location?.onLocationChanged.listen((newLocation) {
-    
       _currentLocation = newLocation;
       moveToPosition(LatLng(_currentLocation?.latitude ?? 0, _currentLocation?.longitude ?? 0));
-
-      // Send location data to Firebase when the map camera position changes
       sendLocationToFirebase(_currentLocation?.latitude ?? 0, _currentLocation?.longitude ?? 0);
     });
   }
@@ -82,9 +77,16 @@ class _DriverPageState extends State<DriverPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Driver View'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            // Add your navigation logic here
+            // For example, you can use Navigator to pop the current screen
+            Navigator.of(context).pop();
+          },
+        ),
       ),
       body: _buildBody(),
-     
     );
   }
 
