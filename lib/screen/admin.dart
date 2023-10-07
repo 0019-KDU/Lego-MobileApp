@@ -5,6 +5,7 @@ import 'package:lego/admin_include/daily_attendance.dart';
 import 'package:lego/admin_include/location_page.dart';
 import 'package:lego/admin_include/payment.dart';
 import 'package:lego/admin_include/sendnotificationscreen.dart';
+import 'package:lego/admin_include/user_count.dart';
 import 'package:lego/authentication/auth_helper.dart';
 
 class AdminPage extends StatefulWidget {
@@ -22,7 +23,8 @@ class _AdminPageState extends State<AdminPage> {
     "assets/location.gif",
     "assets/bubble-chat.gif",
     "assets/notifications.gif",
-    "assets/payment-app.gif"
+    "assets/payment-app.gif",
+    "assets/user.gif",
   ];
 
   List titles = [
@@ -30,7 +32,8 @@ class _AdminPageState extends State<AdminPage> {
     "LOCATION",
     "REQUEST",
     "NOTIFICATION",
-    "USER PAYMENTT"
+    "USER PAYMENTT",
+    "USERS"
   ];
 
   @override
@@ -180,6 +183,14 @@ class _AdminPageState extends State<AdminPage> {
                                   builder: (context) => PaymentDetails([index]),
                                 ),
                               );
+                            case 5:
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UserCount([index]),
+                                ),
+                              );
+                              break;
                             default:
                               break;
                           }

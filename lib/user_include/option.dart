@@ -12,6 +12,7 @@ class SeatRequestScreen extends StatefulWidget {
 class _SeatRequestScreenState extends State<SeatRequestScreen> {
   int requestedSeats = 1;
   String purpose = '';
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -73,6 +74,7 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
             ),
             const SizedBox(height: 20),
             TextField(
+              controller: _purposeController,
               onChanged: (text) {
                 setState(() {
                   purpose = text;
@@ -108,6 +110,7 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
                   setState(() {
                     requestedSeats = 1;
                     purpose = '';
+                    _purposeController.clear();
                   });
 
                   // Show a snackbar indicating the request is pending
