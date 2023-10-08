@@ -26,13 +26,12 @@ class _AdminSeatResponseScreenState extends State<AdminSeatResponseScreen> {
         snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
 
     // Initialize approvalStatus map for all valid requests
-    approvalStatus = Map.fromIterable(
-      requestsData
+    approvalStatus = {
+      for (var requestId in requestsData
           .where((request) => request['requestId'] != null)
-          .map((request) => request['requestId'] as String),
-      key: (requestId) => requestId,
-      value: (_) => false, // Set all requests to false initially
-    );
+          .map((request) => request['requestId'] as String))
+        requestId: false
+    };
 
     setState(() {});
   }

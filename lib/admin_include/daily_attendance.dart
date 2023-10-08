@@ -11,6 +11,7 @@ class ComeGoing extends StatefulWidget {
 class _ComeGoingState extends State<ComeGoing> {
   Map<String, int> goingDestinationCounts = {};
   Map<String, int> comingDestinationCounts = {};
+  int approvedCount = 0; // Added variable to count approved requests
 
   @override
   void initState() {
@@ -52,7 +53,30 @@ class _ComeGoingState extends State<ComeGoing> {
     goingDestinationCounts['Total'] = totalGoingCount;
     comingDestinationCounts['Total'] = totalComingCount;
 
+    // Calculate and set the approved count
+    approvedCount = await _calculateApprovedCount();
+
     setState(() {}); // Trigger a rebuild to display the counts
+  }
+
+  Future<int> _calculateApprovedCount() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('seat_requests')
+        .where("status", isEqualTo: "approved")
+        .get();
+
+    int totalApprovedSeats = 0;
+
+    for (final doc in snapshot.docs) {
+      final status = doc.get("status") as String?;
+      final requestedSeats = doc.get("requestedSeats") as int?;
+
+      if (status == "approved" && requestedSeats != null) {
+        totalApprovedSeats += requestedSeats;
+      }
+    }
+
+    return totalApprovedSeats;
   }
 
   Map<String, int> _countDestinations(List<DocumentSnapshot> docs) {
@@ -129,7 +153,7 @@ class _ComeGoingState extends State<ComeGoing> {
   Widget _buildTotalCountSection() {
     final totalGoingCount = goingDestinationCounts['Total'] ?? 0;
     final totalComingCount = comingDestinationCounts['Total'] ?? 0;
-    final grandTotal = totalGoingCount + totalComingCount;
+    final grandTotal = totalGoingCount + totalComingCount + approvedCount;
 
     return Card(
       elevation: 3,
@@ -148,6 +172,8 @@ class _ComeGoingState extends State<ComeGoing> {
             const SizedBox(height: 10),
             _buildTotalCountCard("Going Total", totalGoingCount),
             _buildTotalCountCard("Coming Total", totalComingCount),
+            _buildTotalCountCard(
+                "Approved Seat Request", approvedCount), // Added approved count
             const Divider(),
             _buildTotalCountCard("Grand Total", grandTotal),
           ],
