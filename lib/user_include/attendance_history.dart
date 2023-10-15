@@ -62,94 +62,50 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                         0;
                   });
 
-                  // Create a map to group data by week
-                  final Map<String, List<QueryDocumentSnapshot>> groupedData =
-                      {};
-
-                  for (final document in combinedData) {
-                    final timestamp = document['timestamp'] as Timestamp?;
-                    if (timestamp != null) {
-                      final date = timestamp.toDate();
-                      final week = DateFormat('yyyy-MM-W').format(date);
-
-                      if (!groupedData.containsKey(week)) {
-                        groupedData[week] = [];
-                      }
-                      groupedData[week]!.add(document);
-                    }
-                  }
-
                   return ListView.builder(
-                    itemCount: groupedData.length,
+                    itemCount: combinedData.length,
                     itemBuilder: (context, index) {
-                      final week = groupedData.keys.elementAt(index);
-                      final weekData = groupedData[week]!;
-                      final weekStartDate = DateFormat('yyyy-MM-W')
-                          .parse(week)
-                          .subtract(Duration(days: 1));
-                      final weekEndDate = DateFormat('yyyy-MM-W')
-                          .parse(week)
-                          .add(Duration(days: 6));
+                      final document = combinedData[index];
 
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // Header for the week
-                          Container(
-                            color: Colors.grey.shade300,
-                            padding: const EdgeInsets.all(8),
-                            child: Text(
-                              'Week of ${DateFormat('yyyy-MM-dd').format(weekStartDate)} - ${DateFormat('yyyy-MM-dd').format(weekEndDate)}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          // Attendance records for the week
-                          ...weekData.map((document) {
-                            final selectedValue =
-                                document['selectedValue'] as String?;
-                            final timestamp =
-                                document['timestamp'] as Timestamp?;
+                      final selectedValue =
+                          document['selectedValue'] as String?;
+                      final timestamp = document['timestamp'] as Timestamp?;
 
-                            if (selectedValue == null || timestamp == null) {
-                              return const ListTile(
-                                title: Text('Data not available'),
-                                subtitle: Text('Date: Unknown'),
-                              );
-                            }
+                      if (selectedValue == null || timestamp == null) {
+                        return const ListTile(
+                          title: Text('Data not available'),
+                          subtitle: Text('Date: Unknown'),
+                        );
+                      }
 
-                            final isGoingCollection =
-                                document.reference.parent!.id == 'going_values';
+                      final isGoingCollection =
+                          document.reference.parent!.id == 'going_values';
 
-                            IconData icon;
-                            Color iconColor;
-                            String title;
+                      IconData icon;
+                      Color iconColor;
+                      String title;
 
-                            if (isGoingCollection) {
-                              icon = Icons.arrow_forward;
-                              iconColor = Colors.green;
-                              title = 'Going - $selectedValue';
-                            } else {
-                              icon = Icons.arrow_back;
-                              iconColor = Colors.blue;
-                              title = 'Coming - $selectedValue';
-                            }
+                      if (isGoingCollection) {
+                        icon = Icons.arrow_forward;
+                        iconColor = Colors.green;
+                        title = 'Going - $selectedValue';
+                      } else {
+                        icon = Icons.arrow_back;
+                        iconColor = Colors.blue;
+                        title = 'Coming - $selectedValue';
+                      }
 
-                            final date = timestamp.toDate();
-                            final formattedDate =
-                                DateFormat('yyyy-MM-dd HH:mm').format(date);
+                      final date = timestamp.toDate();
+                      final formattedDate =
+                          DateFormat('yyyy-MM-dd HH:mm').format(date);
 
-                            return ListTile(
-                              title: Text(title),
-                              subtitle: Text('Date: $formattedDate'),
-                              leading: Icon(
-                                icon,
-                                color: iconColor,
-                              ),
-                            );
-                          }).toList(),
-                        ],
+                      return ListTile(
+                        title: Text(title),
+                        subtitle: Text('Date: $formattedDate'),
+                        leading: Icon(
+                          icon,
+                          color: iconColor,
+                        ),
                       );
                     },
                   );

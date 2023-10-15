@@ -18,10 +18,10 @@ class _SenNotificationState extends State<SenNotification> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Send Notification'),
+        title: const Text('Send Notification'),
         backgroundColor: Colors.blue,
         leading: IconButton(
-            icon: Icon(Icons.arrow_back), // Add a back icon
+            icon: const Icon(Icons.arrow_back), // Add a back icon
             onPressed: () {
               Navigator.of(context)
                   .pop(); // If WebView can't go back, pop the route

@@ -116,8 +116,8 @@ class _RegisterState extends State<Register> {
                                 opacity: activeIndex == 1 ? 1 : 0,
                                 duration: const Duration(seconds: 1),
                                 curve: Curves.linear,
-                                child: Image.network(
-                                  'https://ouch-cdn2.icons8.com/vSx9H3yP2D4DgVoaFPbE4HVf6M4Phd-8uRjBZBnl83g/rs:fit:784:784/czM6Ly9pY29uczgu/b3VjaC1wcm9kLmFz/c2V0cy9zdmcvNC84/MzcwMTY5OS1kYmU1/LTQ1ZmEtYmQ1Ny04/NTFmNTNjMTlkNTcu/c3Zn.png',
+                                child: Image.asset(
+                                  'assets/background.png',
                                   height: 250,
                                 ),
                               ),

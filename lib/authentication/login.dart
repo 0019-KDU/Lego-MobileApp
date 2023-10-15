@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lego/authentication/froget_password.dart';
 import 'package:lego/authentication/register.dart';
 import 'package:lego/components/app_colors.dart';
 import 'package:lego/components/app_styles.dart';
@@ -173,7 +174,7 @@ class _LoginPageState extends State<LoginPage> {
                                 },
                                 keyboardType: TextInputType.emailAddress,
                               ),
-                              SizedBox(height: height * 0.014),
+                              SizedBox(height: height * 0.015),
                               TextFormField(
                                 controller: passwordController,
                                 obscureText: _isObscure3,
@@ -238,7 +239,27 @@ class _LoginPageState extends State<LoginPage> {
                                 },
                                 keyboardType: TextInputType.emailAddress,
                               ),
-                              SizedBox(height: height * 0.08),
+                              SizedBox(height: height * 0.02),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.push(context,
+                                        MaterialPageRoute(builder: (context) {
+                                      return const FrogetPasswordPage();
+                                    }));
+                                  },
+                                  child: Text(
+                                    'Forgot Password?',
+                                    style: ralewayStyle.copyWith(
+                                      fontSize: 12.0,
+                                      color: AppColors.mainBlueColor,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: height * 0.02),
                               MaterialButton(
                                 shape: const RoundedRectangleBorder(
                                   borderRadius: BorderRadius.all(

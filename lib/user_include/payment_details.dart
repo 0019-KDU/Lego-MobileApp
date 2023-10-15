@@ -1,140 +1,76 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
-class PaymentScreen extends StatefulWidget {
-  const PaymentScreen({super.key});
+class MainCard extends StatefulWidget {
+  const MainCard({super.key});
 
   @override
-  State<PaymentScreen> createState() => _PaymentScreenState();
+  State<MainCard> createState() => _MainCardState();
 }
 
-class _PaymentScreenState extends State<PaymentScreen> {
-  late User _currentUser;
-  XFile? _selectedImage;
+class _MainCardState extends State<MainCard> {
+  String? userName;
+  double? cost;
+  String? costMessage;
+  String? userRole;
 
   @override
   void initState() {
     super.initState();
-    _currentUser = FirebaseAuth.instance.currentUser!;
+    fetchUserName();
+    fetchUserData();
   }
 
-  Future<void> _handleTap() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+  Future<void> fetchUserName() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
 
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = pickedFile;
-      });
-    }
-  }
-
-  Future<String?> uploadImageToStorage(
-      XFile imageFile, String paymentId) async {
-    String? imageUrl;
-    try {
-      TaskSnapshot snapshot = await FirebaseStorage.instance
-          .ref('payments/$paymentId')
-          .putFile(File(imageFile.path));
-      imageUrl = await snapshot.ref.getDownloadURL();
-    } catch (e) {
-      print('Error uploading image: $e');
-    }
-    return imageUrl;
-  }
-
-  void savePaymentData() async {
-    try {
-      if (_selectedImage == null) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Confirmation'),
-              content: const Text(
-                  'Are you sure you want to make a payment without adding a photo?'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _performPayment();
-                  },
-                  child: const Text('Proceed'),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        _performPayment();
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  void _performPayment() async {
-    try {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(_currentUser.uid)
+    if (currentUser != null) {
+      final userDoc = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(currentUser.uid)
           .get();
 
-      // Convert userDoc data to a Map
-      Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+      if (userDoc.exists) {
+        setState(() {
+          userName = userDoc.get("username");
+        });
+      }
+    }
+  }
 
-      if (userDoc.exists && userData['username'] != null) {
-        String userName = userData['username'];
-        DocumentReference paymentRef =
-            await FirebaseFirestore.instance.collection('payments').add({
-          'status': 'pending',
-          'userName': userName,
+  Future<void> fetchUserData() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser != null) {
+      final userDoc = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(currentUser.uid)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          userName = userDoc.get("username");
+          userRole = userDoc.get("rool");
         });
 
-        if (_selectedImage != null) {
-          String? imageUrl =
-              await uploadImageToStorage(_selectedImage!, paymentRef.id);
-          if (imageUrl != null) {
-            await FirebaseFirestore.instance
-                .collection('payments')
-                .doc(paymentRef.id)
-                .update({'imageUrl': imageUrl});
-          }
-        }
+        // Fetch the cost based on the user's role
+        final costCollection = userRole == "Permanent"
+            ? FirebaseFirestore.instance.collection("permant")
+            : FirebaseFirestore.instance.collection("non_permant");
 
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Payment Pending'),
-              content: const Text('Your payment is pending approval.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Close'),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        print("User document not found or username is null");
+        final costDoc = await costCollection.doc("cost").get();
+        if (costDoc.exists) {
+          setState(() {
+            cost = costDoc.get("price")?.toDouble();
+
+            // Set the display message based on the user's role
+            costMessage = userRole == "permanent"
+                ? 'Your Monthly Payment Due is:'
+                : 'You must pay per ride:';
+          });
+        }
       }
-    } catch (e) {
-      print(e);
     }
   }
 
@@ -142,36 +78,29 @@ class _PaymentScreenState extends State<PaymentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Payment Screen'),
+        title: const Text('User Details'),
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            InkWell(
-              onTap: _handleTap,
-              child: Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  color: Colors.grey, // Placeholder color
-                  borderRadius: BorderRadius.circular(10),
-                  image: _selectedImage != null
-                      ? DecorationImage(
-                          image: FileImage(File(_selectedImage!.path)),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
-                ),
-                child: _selectedImage == null
-                    ? Icon(Icons.add_a_photo, size: 50, color: Colors.white)
-                    : null,
+            // Display the user's name
+            Text(
+              'Hello, ${userName ?? 'User'}', // Use 'User' as a default if userName is null
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: savePaymentData,
-              child: const Text('Pay'),
+            // Display the cost to the user
+            Text(
+              cost != null
+                  ? '$costMessage \$${cost?.toStringAsFixed(2)}'
+                  : 'Cost: Loading...',
+              style: const TextStyle(
+                fontSize: 18,
+              ),
             ),
           ],
         ),

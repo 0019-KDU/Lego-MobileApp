@@ -32,47 +32,48 @@ class _ComeGoingState extends State<ComeGoing> {
   }
 
   Future<void> _storeSelectedValue() async {
-    if (_fromkey.currentState!.validate()) {
-      final currentUser = FirebaseAuth.instance.currentUser;
+    try {
+      if (tripType == null) {
+        _showDialog(
+            "Warning", "Please select a trip type (Going or Coming) first.");
+        return;
+      }
 
-      if (currentUser != null) {
-        final selectedValuesCollection = FirebaseFirestore.instance
-            .collection(tripType == 'Going' ? "going_values" : "coming_values");
+      if (_fromkey.currentState!.validate()) {
+        final currentUser = FirebaseAuth.instance.currentUser;
 
-        final existingValueDoc = await selectedValuesCollection
-            .where("userId", isEqualTo: currentUser.uid)
-            .get();
+        if (currentUser != null) {
+          final selectedValuesCollection = FirebaseFirestore.instance
+              .collection(
+                  tripType == 'Going' ? "going_values" : "coming_values");
 
-        if (existsSelected == null) {
-          _showDialog("Error", "Please select a value from the dropdown.");
-          return;
-        }
+          final existingValueDoc = await selectedValuesCollection
+              .where("userId", isEqualTo: currentUser.uid)
+              .get();
 
-        if (existingValueDoc.docs.isNotEmpty) {
-          // User has already saved a value, check time difference
-          final lastTimestamp =
-              existingValueDoc.docs.first.get("timestamp") as Timestamp;
-          final currentTime = Timestamp.now();
-
-          // Calculate the difference in seconds
-          final timeDifference = currentTime.seconds - lastTimestamp.seconds;
-          const requiredTimeDifference = 1 * 24 * 60 * 60; // 1 days in seconds
-
-          if (timeDifference < requiredTimeDifference) {
-            _showDialog("Warning", "You can add a new value after a few days.");
+          if (existsSelected == null) {
+            _showDialog("Error", "Please select a value from the dropdown.");
             return;
           }
+
+          if (existingValueDoc.docs.isNotEmpty) {
+            _showDialog("Warning", "You have already added a value.");
+            return;
+          }
+
+          // User hasn't saved a value, proceed to save
+          await selectedValuesCollection.add({
+            "userId": currentUser.uid,
+            "selectedValue": existsSelected,
+            "timestamp": FieldValue.serverTimestamp(),
+          });
+
+          _showDialog("Success", "Value successfully saved.");
         }
-
-        // User hasn't saved a value or enough time has passed, proceed to save
-        await selectedValuesCollection.add({
-          "userId": currentUser.uid,
-          "selectedValue": existsSelected,
-          "timestamp": FieldValue.serverTimestamp(),
-        });
-
-        _showDialog("Success", "Value successfully saved.");
       }
+    } catch (e) {
+      print("Error in _storeSelectedValue: $e");
+      _showDialog("Error", "An error occurred while processing your request.");
     }
   }
 

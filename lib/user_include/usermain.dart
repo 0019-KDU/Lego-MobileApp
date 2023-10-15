@@ -9,8 +9,8 @@ import 'package:lego/user_include/payment_details.dart';
 
 class UserMainPage extends StatefulWidget {
   const UserMainPage({
-    super.key,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<UserMainPage> createState() => _UserMainPageState();
@@ -103,6 +103,9 @@ class _UserMainPageState extends State<UserMainPage>
                   ),
                 ],
               ),
+              const SizedBox(
+                height: 32,
+              ),
               Expanded(
                 child: ListView(
                   physics: const BouncingScrollPhysics(),
@@ -149,29 +152,36 @@ class _UserMainPageState extends State<UserMainPage>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _cardMenu(
-                          title: "JOURNEY",
-                          icon: 'assets/go.png',
-                          onTap: () {
-                            // Handle the JOURNEY card onTap action
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const ComeGoing()),
-                            );
-                          },
+                        Expanded(
+                          child: _cardMenu(
+                            title: "JOURNEY",
+                            icon: 'assets/go.png',
+                            onTap: () {
+                              // Handle the JOURNEY card onTap action
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const ComeGoing()),
+                              );
+                            },
+                          ),
                         ),
-                        _cardMenu(
-                          title: "LOCATION",
-                          icon: 'assets/map.png',
-                          onTap: () {
-                            // Handle the LOCATION card onTap action
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Location()),
-                            );
-                          },
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: _cardMenu(
+                            title: "LOCATION",
+                            icon: 'assets/map.png',
+                            onTap: () {
+                              // Handle the LOCATION card onTap action
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const Location()),
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -181,32 +191,39 @@ class _UserMainPageState extends State<UserMainPage>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _cardMenu(
-                          title: "REQUEST",
-                          icon: 'assets/mobile.png',
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const SeatRequestScreen()),
-                            );
-                          },
+                        Expanded(
+                          child: _cardMenu(
+                            title: "REQUEST",
+                            icon: 'assets/mobile.png',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const SeatRequestScreen()),
+                              );
+                            },
+                          ),
                         ),
-                        _cardMenu(
-                          title: "PAYMENT DETAILS",
-                          icon: 'assets/cashless-payment.png',
-                          onTap: () {
-                            // Handle the PAYMENT DETAILS card onTap action
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const PaymentScreen()),
-                            );
-                          },
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: _cardMenu(
+                            title: "PAYMENT DETAILS",
+                            icon: 'assets/cashless-payment.png',
+                            onTap: () {
+                              // Handle the PAYMENT DETAILS card onTap action
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const MainCard()),
+                              );
+                            },
+                          ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               )
