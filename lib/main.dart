@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:lego/authentication/login.dart';
+import 'package:lego/driver_include/drivermain.dart';
 import 'package:lego/user_include/notification.dart';
 import 'package:lego/user_include/usermain.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,11 +32,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        navigatorKey: navigatorKey,
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primaryColor: Colors.blue[900],
-        ),
-        home: isLoggedIn ? const UserMainPage() : const LoginPage());
+      navigatorKey: navigatorKey,
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primaryColor: Colors.blue[900],
+      ),
+      home: isLoggedIn ? const UserMainPage() : const LoginPage(),
+      // Add DriverMainPage as an option in your app's navigation
+      routes: {
+        '/driverMain': (context) => DriverMainPage(),
+      },
+    );
   }
 }

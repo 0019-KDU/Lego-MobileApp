@@ -7,8 +7,8 @@ import 'package:lego/authentication/register.dart';
 import 'package:lego/components/app_colors.dart';
 import 'package:lego/components/app_styles.dart';
 import 'package:lego/components/responsive_widget.dart';
+import 'package:lego/driver_include/drivermain.dart';
 import 'package:lego/screen/admin.dart';
-import 'package:lego/screen/driver.dart';
 import 'package:lego/user_include/usermain.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -374,7 +374,7 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => const DriverPage(),
+              builder: (context) => const DriverMainPage(),
             ),
           );
         } else {
