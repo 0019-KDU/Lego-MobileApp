@@ -25,6 +25,12 @@ class _DriverPageState extends State<DriverPage> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _googleMapController = Completer();
+    super.dispose();
+  }
+
   _init() async {
     _location = Location();
     _cameraPosition = CameraPosition(
@@ -40,8 +46,10 @@ class _DriverPageState extends State<DriverPage> {
     });
     _location?.onLocationChanged.listen((newLocation) {
       _currentLocation = newLocation;
-      moveToPosition(LatLng(_currentLocation?.latitude ?? 0, _currentLocation?.longitude ?? 0));
-      sendLocationToFirebase(_currentLocation?.latitude ?? 0, _currentLocation?.longitude ?? 0);
+      moveToPosition(LatLng(
+          _currentLocation?.latitude ?? 0, _currentLocation?.longitude ?? 0));
+      sendLocationToFirebase(
+          _currentLocation?.latitude ?? 0, _currentLocation?.longitude ?? 0);
     });
   }
 
@@ -63,7 +71,8 @@ class _DriverPageState extends State<DriverPage> {
         'latitude': latitude,
         'longitude': longitude,
       }).then((_) {
-        print('Location sent to Firebase: Latitude $latitude, Longitude $longitude');
+        print(
+            'Location sent to Firebase: Latitude $latitude, Longitude $longitude');
       }).catchError((error) {
         print('Failed to send location: $error');
       });
