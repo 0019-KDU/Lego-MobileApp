@@ -211,36 +211,25 @@ class _ComeGoingState extends State<ComeGoing> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+      ),
       body: Form(
         key: _fromkey,
-        child: ListView(
+        child: Column(
           children: [
             Container(
-              margin: const EdgeInsets.only(top: 18, left: 24, right: 24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Icon(
-                      Icons.arrow_back_ios,
-                      color: Colors.indigo,
-                    ),
-                  ),
-                ],
+              margin: const EdgeInsets.all(10),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [],
               ),
             ),
             Container(
-              width: 550,
-              height: 350,
+              margin: const EdgeInsets.all(30),
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.grey,
-                  width: 3,
-                ),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.3),
@@ -249,36 +238,64 @@ class _ComeGoingState extends State<ComeGoing> {
                     offset: const Offset(0, 3),
                   ),
                 ],
-                borderRadius: BorderRadius.circular(16),
               ),
-              margin: const EdgeInsets.all(30),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Radio(
-                      value: 'Going',
-                      groupValue: tripType,
-                      onChanged: (value) {
-                        setState(() {
-                          tripType = value;
-                        });
-                      },
-                    ),
-                    const Text('Going'),
-                    Radio(
-                      value: 'Coming',
-                      groupValue: tripType,
-                      onChanged: (value) {
-                        setState(() {
-                          tripType = value;
-                        });
-                      },
-                    ),
-                    const Text('Coming'),
-                  ]),
-                  const SizedBox(
-                    height: 10,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Radio(
+                        value: 'Going',
+                        groupValue: tripType,
+                        onChanged: (value) {
+                          setState(() {
+                            tripType = value;
+                          });
+                        },
+                      ),
+                      const Text(
+                        'S-H',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      Radio(
+                        value: 'Coming',
+                        groupValue: tripType,
+                        onChanged: (value) {
+                          setState(() {
+                            tripType = value;
+                          });
+                        },
+                      ),
+                      const Text('H-S',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                    ],
                   ),
+                ],
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(30),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.3),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -296,52 +313,34 @@ class _ComeGoingState extends State<ComeGoing> {
                           color: Colors.black,
                         ),
                       ),
-                      const SizedBox(
-                        width: 8,
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
                       TextButton(
                         onPressed: () {
                           setState(() {
                             isDropdownVisible = !isDropdownVisible;
                           });
                         },
-                        child: Container(
-                          alignment: Alignment.center,
-                          child: Text(
-                            existsSelected ?? "Choose your Exist",
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                            ),
+                        child: Text(
+                          existsSelected ?? "Choose your Exit",
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        width: 10,
-                      ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
                           backgroundColor: Colors.green.shade400,
-                          shadowColor: Colors.greenAccent,
-                          elevation: 3,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(32.0),
                           ),
                           minimumSize: const Size(90, 45),
                         ),
                         onPressed: _storeSelectedValue,
-                        child: const Text("Going"),
+                        child: const Text("Go"),
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
                           backgroundColor: Colors.blue,
-                          shadowColor: Colors.greenAccent,
-                          elevation: 3,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(32.0),
                           ),
@@ -374,25 +373,26 @@ class _ComeGoingState extends State<ComeGoing> {
                 ],
               ),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.green.shade400,
-                shadowColor: Colors.greenAccent,
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32.0),
+            Container(
+              margin: const EdgeInsets.all(30),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green.shade400,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32.0),
+                  ),
+                  minimumSize: const Size(90, 45),
                 ),
-                minimumSize: const Size(90, 45),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AttendanceHistoryScreen(),
+                    ),
+                  );
+                },
+                child: const Text("History"),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const AttendanceHistoryScreen()),
-                );
-              },
-              child: const Text("History"),
             ),
           ],
         ),

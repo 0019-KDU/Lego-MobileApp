@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lego/classes/weather_service.dart';
+import 'package:lego/classes/wether_model.dart';
 import 'package:lego/components/drawer.dart';
 import 'package:lego/user_include/exit_comeing.dart';
 import 'package:lego/user_include/location.dart';
 import 'package:lego/user_include/option.dart';
 import 'package:lego/user_include/payment_details.dart';
+import 'package:lottie/lottie.dart';
 
 class UserMainPage extends StatefulWidget {
   const UserMainPage({
@@ -21,26 +24,11 @@ class _UserMainPageState extends State<UserMainPage>
   String? userName;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  late AnimationController _controller;
-  late Animation<Offset> _animation;
-
   @override
   void initState() {
     super.initState();
+    _fetchWeather();
     fetchUserName();
-
-    // Initialize the animation controller and animation
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    );
-    _animation = Tween<Offset>(
-      begin: const Offset(0, 0),
-      end: const Offset(0, 10),
-    ).animate(_controller);
-
-    // Start the animation
-    _controller.repeat(reverse: true);
   }
 
   Future<void> fetchUserName() async {
@@ -60,9 +48,68 @@ class _UserMainPageState extends State<UserMainPage>
     }
   }
 
+  //todo:api key
+  final _weatherService = WeatherService('f2f0d40bb2beaf83b396318ee2bb419c');
+  Weather? _weather;
+
+  //todo:fectch weather
+  _fetchWeather() async {
+    String cityName = (await _weatherService.getCurrentDistrict()).trim();
+
+    if (cityName == "Moneragala") {
+      cityName = "Monaragala";
+    }
+
+    try {
+      final weather = await _weatherService.getWeather(cityName);
+      _weather = weather;
+    } catch (e) {
+      print(e);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('City not found. Please try again.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  String getWeatherAnimation(String mainCondition) {
+    if (mainCondition == null) return 'assets/sunny.json';
+
+    switch (mainCondition.toLowerCase()) {
+      case 'clouds':
+      case 'mist':
+      case 'smoke':
+      case 'haze':
+      case 'dust':
+      case 'fog':
+        return 'assets/clould.json';
+      case 'rain':
+      case 'drizzle':
+        return 'assets/rain.json';
+      case 'thunderstorm':
+        return 'assets/thunder.json';
+      case 'clear':
+        return 'assets/sunny.json';
+      default:
+        return 'assets/sunny.json';
+    }
+  }
+
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 
@@ -114,18 +161,18 @@ class _UserMainPageState extends State<UserMainPage>
                       height: 32,
                     ),
                     Center(
-                      child: AnimatedBuilder(
-                        animation: _animation, // Use the animation
-                        builder: (context, child) {
-                          return Transform.translate(
-                            offset:
-                                _animation.value, // Apply the animation value
-                            child: Image.asset(
-                              'assets/banner.png',
-                              scale: 1.2,
-                            ),
-                          );
-                        },
+                      child: Column(
+                        children: [
+                          Text(_weather == null
+                              ? 'Loading city name...'
+                              : _weather?.cityName ??
+                                  "City Name Not Available"),
+                          Lottie.asset(getWeatherAnimation(
+                              _weather?.mainCondition ?? "")),
+                          Text('${_weather?.temperatuer.round()}ºC'),
+                          Text(_weather?.mainCondition ??
+                              "") // Make sure 'temperature' is a property in your Weather model.
+                        ],
                       ),
                     ),
                     const SizedBox(

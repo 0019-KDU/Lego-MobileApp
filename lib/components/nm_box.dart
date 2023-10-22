@@ -47,3 +47,25 @@ BoxDecoration nMbtn = BoxDecoration(
         blurRadius: 2,
       )
     ]);
+
+class NMButton extends StatelessWidget {
+  final bool down;
+  final IconData icon;
+  const NMButton(
+      {super.key,
+      required this.down,
+      required this.icon,
+      required Null Function() onTap});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 55,
+      height: 55,
+      decoration: down ? nMboxInvert : nMbox,
+      child: Icon(
+        icon,
+        color: down ? fCD : fCL,
+      ),
+    );
+  }
+}

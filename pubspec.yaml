@@ -61,6 +61,19 @@ dependencies:
   location: ^5.0.3
   google_maps: ^6.3.0
   badges: ^3.1.2
+  jiffy: ^6.2.1
+  pdf: ^3.10.4
+  path_provider: ^2.1.1
+  share_plus: ^7.2.1
+  share: ^2.0.4
+  open_file: ^3.3.2
+  printing: ^5.11.0
+  syncfusion_flutter_charts: ^23.1.41
+  syncfusion_flutter_pdf: ^23.1.41
+  permission_handler: ^11.0.1
+  http: ^1.1.0
+  geocoding: ^2.1.1
+  geolocator: ^10.0.1
 
 dev_dependencies:
   flutter_test:
@@ -100,6 +113,10 @@ flutter:
     - assets/profile.png
     - assets/user.gif
     - assets/background.png
+    - assets/clould.json
+    - assets/rain.json
+    - assets/sunny.json
+    - assets/thunder.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

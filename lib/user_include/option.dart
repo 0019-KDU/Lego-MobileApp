@@ -85,21 +85,20 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    NMButton(
-                      down: false,
-                      icon: Icons.arrow_back,
+                    GestureDetector(
                       onTap: () {
                         Navigator.pop(context);
-                        if (kDebugMode) {
-                          print("Button tapped!");
-                        }
                       },
+                      child: const Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.indigo,
+                      ),
                     ),
                   ],
                 ),
               ),
               Container(),
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
               const Text(
@@ -275,12 +274,12 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return const CircularProgressIndicator();
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else if (!snapshot.hasData ||
                         snapshot.data!.docs.isEmpty) {
-                      return Text('No seat requests found.');
+                      return const Text('No seat requests found.');
                     } else {
                       final documents = snapshot.data!.docs;
                       // Set the requestedSeats variable based on the latest request
@@ -316,7 +315,7 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
                                   onTap: () {
                                     // Handle ListTile tap if needed
                                   },
-                                  child: Container(
+                                  child: SizedBox(
                                     height: 100, // Adjust the height as needed
                                     child: ListTile(
                                       title: Text(
@@ -336,7 +335,7 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
                                   ),
                                 );
                               } else {
-                                return CircularProgressIndicator(); // Show a loading indicator while calculating the price.
+                                return const CircularProgressIndicator(); // Show a loading indicator while calculating the price.
                               }
                             },
                           );
@@ -424,24 +423,5 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
       }
       // Handle the error here, e.g., display an error message to the user.
     }
-  }
-}
-
-class NMButton extends StatelessWidget {
-  final bool down;
-  final IconData icon;
-  const NMButton(
-      {required this.down, required this.icon, required Null Function() onTap});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 55,
-      height: 55,
-      decoration: down ? nMboxInvert : nMbox,
-      child: Icon(
-        icon,
-        color: down ? fCD : fCL,
-      ),
-    );
   }
 }
