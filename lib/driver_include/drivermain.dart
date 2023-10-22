@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lego/components/drawer.dart';
 import 'package:lego/driver_include/d_attendance.dart';
+import 'package:lego/driver_include/location_service.dart';
 import 'package:lego/screen/driver.dart';
 
 class DriverMainPage extends StatefulWidget {
@@ -12,27 +13,16 @@ class DriverMainPage extends StatefulWidget {
 
 class _DriverMainPageState extends State<DriverMainPage>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
   @override
   void initState() {
     super.initState();
-    _initAnimation();
+    _initLocationService();
   }
 
-  void _initAnimation() {
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    );
-
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  void _initLocationService() async {
+    // Create an instance of LocationService and call shareLocation
+    LocationService locationService = LocationService();
+    await locationService.shareLocation();
   }
 
   @override
