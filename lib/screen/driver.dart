@@ -13,7 +13,7 @@ class DriverPage extends StatefulWidget {
 }
 
 class _DriverPageState extends State<DriverPage> {
-  final Completer<GoogleMapController> _googleMapController = Completer();
+  Completer<GoogleMapController> _googleMapController = Completer();
   CameraPosition? _cameraPosition;
   Location? _location;
   LocationData? _currentLocation;
