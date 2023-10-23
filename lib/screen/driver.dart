@@ -13,7 +13,7 @@ class DriverPage extends StatefulWidget {
 }
 
 class _DriverPageState extends State<DriverPage> {
-  Completer<GoogleMapController> _googleMapController = Completer();
+  final Completer<GoogleMapController> _googleMapController = Completer();
   CameraPosition? _cameraPosition;
   Location? _location;
   LocationData? _currentLocation;
@@ -40,8 +40,10 @@ class _DriverPageState extends State<DriverPage> {
     });
     _location?.onLocationChanged.listen((newLocation) {
       _currentLocation = newLocation;
-      moveToPosition(LatLng(_currentLocation?.latitude ?? 0, _currentLocation?.longitude ?? 0));
-      sendLocationToFirebase(_currentLocation?.latitude ?? 0, _currentLocation?.longitude ?? 0);
+      moveToPosition(LatLng(
+          _currentLocation?.latitude ?? 0, _currentLocation?.longitude ?? 0));
+      sendLocationToFirebase(
+          _currentLocation?.latitude ?? 0, _currentLocation?.longitude ?? 0);
     });
   }
 
@@ -63,7 +65,8 @@ class _DriverPageState extends State<DriverPage> {
         'latitude': latitude,
         'longitude': longitude,
       }).then((_) {
-        print('Location sent to Firebase: Latitude $latitude, Longitude $longitude');
+        print(
+            'Location sent to Firebase: Latitude $latitude, Longitude $longitude');
       }).catchError((error) {
         print('Failed to send location: $error');
       });
