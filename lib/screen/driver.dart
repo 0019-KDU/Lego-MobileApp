@@ -25,6 +25,12 @@ class _DriverPageState extends State<DriverPage> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _googleMapController = Completer();
+    super.dispose();
+  }
+
   _init() async {
     _location = Location();
     _cameraPosition = CameraPosition(
