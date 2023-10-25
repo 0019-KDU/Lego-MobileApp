@@ -51,53 +51,75 @@ class _AdminPaymentsState extends State<AdminPayments> {
             );
           } else {
             paymentItems = snapshot.data!.docs.map((payment) {
-              String photoUrl = payment['photoUrl'];
+              String? photoUrl =
+                  payment['photoUrl'] as String?; // Cast to String?
               DateTime paymentDate =
                   (payment['paymentDate'] as Timestamp).toDate();
               String userRole = payment['userRole'];
               String documentId = payment.id; // Get the document ID
-              return PaymentItem(payment['username'], paymentDate, photoUrl,
-                  userRole, documentId);
+
+              // Use the null coalescing operator (??) to provide a default value if photoUrl is null
+              String defaultPhotoUrl =
+                  'assets/default.jpg'; // Change this to your desired default URL
+
+              return PaymentItem(
+                payment['username'],
+                paymentDate,
+                photoUrl ?? defaultPhotoUrl,
+                userRole,
+                documentId,
+              );
             }).toList();
-
-            return ListView.builder(
-              itemCount: paymentItems.length,
-              itemBuilder: (context, index) {
-                var payment = paymentItems[index];
-
-                return Card(
-                  margin: const EdgeInsets.all(8),
-                  child: ListTile(
-                    title: Text('Username: ${payment.username} paid'),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                            'Payment Date: ${DateFormat('yyyy/MM/dd').format(payment.paymentDate)}'),
-                        Text('User Role: ${payment.userRole}'),
-                      ],
-                    ),
-                    leading: GestureDetector(
-                      onTap: () {
-                        _showImageDialog(context, payment.photoUrl);
-                      },
-                      child: Image.network(
-                        payment.photoUrl,
-                        width: 80,
-                        height: 80,
-                      ),
-                    ),
-                    trailing: ElevatedButton(
-                      onPressed: () {
-                        handleConfirmation(payment);
-                      },
-                      child: const Text('Confirm'),
-                    ),
-                  ),
-                );
-              },
-            );
           }
+          return ListView.builder(
+            itemCount: paymentItems.length,
+            itemBuilder: (context, index) {
+              var payment = paymentItems[index];
+
+              return Card(
+                margin: const EdgeInsets.all(8),
+                child: ListTile(
+                  title: Text('Username: ${payment.username} paid'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Payment Date: ${DateFormat('yyyy/MM/dd').format(payment.paymentDate)}',
+                      ),
+                      Text('User Role: ${payment.userRole}'),
+                    ],
+                  ),
+                  leading: GestureDetector(
+                    onTap: () {
+                      if (payment.photoUrl != 'assets/default.jpg') {
+                        _showImageDialog(context, payment.photoUrl);
+                      } else {
+                        // Handle the case where the image is the default asset (optional)
+                      }
+                    },
+                    child: payment.photoUrl != 'assets/default.jpg'
+                        ? Image.network(
+                            payment.photoUrl,
+                            width: 80,
+                            height: 80,
+                          )
+                        : Image.asset(
+                            payment
+                                .photoUrl, // Use Image.asset for local assets
+                            width: 80,
+                            height: 80,
+                          ),
+                  ),
+                  trailing: ElevatedButton(
+                    onPressed: () {
+                      handleConfirmation(payment);
+                    },
+                    child: const Text('Confirm'),
+                  ),
+                ),
+              );
+            },
+          );
         },
       ),
     );

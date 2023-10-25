@@ -118,6 +118,7 @@ flutter:
     - assets/sunny.json
     - assets/thunder.json
     - assets/attend.png
+    - assets/default.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
