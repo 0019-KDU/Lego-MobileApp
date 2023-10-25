@@ -65,23 +65,6 @@ class _UserMainPageState extends State<UserMainPage>
       _weather = weather;
     } catch (e) {
       print(e);
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('City not found. Please try again.'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
     }
   }
 
@@ -106,11 +89,6 @@ class _UserMainPageState extends State<UserMainPage>
       default:
         return 'assets/sunny.json';
     }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override
@@ -151,27 +129,32 @@ class _UserMainPageState extends State<UserMainPage>
                 ],
               ),
               const SizedBox(
-                height: 32,
+                height: 30,
               ),
               Expanded(
                 child: ListView(
                   physics: const BouncingScrollPhysics(),
                   children: [
-                    const SizedBox(
-                      height: 32,
-                    ),
                     Center(
                       child: Column(
                         children: [
-                          Text(_weather == null
-                              ? 'Loading city name...'
-                              : _weather?.cityName ??
-                                  "City Name Not Available"),
+                          Text(
+                            _weather == null
+                                ? 'Loading city name...'
+                                : _weather?.cityName ??
+                                    "City Name Not Available",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                           Lottie.asset(getWeatherAnimation(
                               _weather?.mainCondition ?? "")),
-                          Text('${_weather?.temperatuer.round()}ºC'),
-                          Text(_weather?.mainCondition ??
-                              "") // Make sure 'temperature' is a property in your Weather model.
+                          Text(
+                            '${_weather?.temperatuer.round()}ºC',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            _weather?.mainCondition ?? "",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ) // Make sure 'temperature' is a property in your Weather model.
                         ],
                       ),
                     ),

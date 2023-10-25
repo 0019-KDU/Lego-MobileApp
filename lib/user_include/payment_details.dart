@@ -186,88 +186,104 @@ class _MainCardState extends State<MainCard> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text('User Details'),
+        title: const Text('Payment Details'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center, // Center the content
-            children: <Widget>[
-              Text(
-                'Hello, ${userName ?? 'User'}',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                cost != null
-                    ? '$costMessage \$${cost?.toStringAsFixed(2)}'
-                    : 'Cost: Loading...',
-                style: const TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-              const SizedBox(height: 25),
-              Container(
-                width: 380,
-                height: 290,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 3,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Center(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    GestureDetector(
-                      onTap: _pickImage, // Trigger image selection on tap
-                      child: userImage != null
-                          ? Image.file(
-                              userImage!,
-                              width: 100,
-                              height: 100,
-                            )
-                          : Container(
-                              width: 150,
-                              height: 150,
-                              color: Colors.grey, // Placeholder for the image
-                              child: const Center(
-                                child: Text('Tap to Upload Image',
-                                    textAlign: TextAlign.center),
+                    Text(
+                      'Hello, ${userName ?? 'User'}',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      cost != null
+                          ? '$costMessage \$${cost?.toStringAsFixed(2)}'
+                          : 'Cost: Loading...',
+                      style: const TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 25),
+                    Container(
+                      width: 380,
+                      height: 290,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 3,
+                            blurRadius: 5,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: _pickImage,
+                            child: userImage != null
+                                ? Image.file(
+                                    userImage!,
+                                    width: 100,
+                                    height: 100,
+                                  )
+                                : Container(
+                                    width: 150,
+                                    height: 150,
+                                    color: Colors.grey,
+                                    child: const Center(
+                                      child: Text(
+                                        'Tap to Upload Image',
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: handlePayment,
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
                               ),
                             ),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: handlePayment,
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: Text('Pay'),
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              child: Text('Pay'),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Navigate to the RequestHistoryScreen when the button is pressed
+        }, // You can use a different icon here
+        backgroundColor: Colors.black,
+        child:
+            const Icon(Icons.history), // Set the background color of the button
       ),
     );
   }

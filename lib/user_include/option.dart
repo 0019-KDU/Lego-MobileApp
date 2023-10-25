@@ -74,30 +74,15 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
 
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+        ),
         backgroundColor: mC,
         body: Container(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.indigo,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(),
               const SizedBox(
                 height: 30,
               ),
