@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lego/user_include/paymentHistory.dart';
 
 class MainCard extends StatefulWidget {
   const MainCard({super.key});
@@ -279,11 +280,16 @@ class _MainCardState extends State<MainCard> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigate to the RequestHistoryScreen when the button is pressed
-        }, // You can use a different icon here
+          // Navigate to the PaymentHistoryPage and pass the userRole
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const PaymentHistoryPage(),
+            ),
+          );
+        },
         backgroundColor: Colors.black,
-        child:
-            const Icon(Icons.history), // Set the background color of the button
+        child: const Icon(Icons.history),
       ),
     );
   }
