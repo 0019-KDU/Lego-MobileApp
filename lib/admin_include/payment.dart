@@ -22,11 +22,15 @@ class AdminPayments extends StatefulWidget {
 
 class _AdminPaymentsState extends State<AdminPayments> {
   List<PaymentItem> paymentItems = [];
+
   @override
-  void dispose() {
-    // Cancel any ongoing tasks (e.g., timers)
-    // Dispose of any resources that may still be active
-    super.dispose();
+  void initState() {
+    super.initState();
+    fetchPayments().then((payments) {
+      setState(() {
+        paymentItems = payments;
+      });
+    });
   }
 
   @override
@@ -36,100 +40,82 @@ class _AdminPaymentsState extends State<AdminPayments> {
         backgroundColor: Colors.black,
         title: const Text('Admin Payments'),
       ),
-      body: FutureBuilder<QuerySnapshot>(
-        future: fetchPayments(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Text('No payment data available.'),
-            );
-          } else {
-            paymentItems = snapshot.data!.docs.map((payment) {
-              String? photoUrl =
-                  payment['photoUrl'] as String?; // Cast to String?
-              DateTime paymentDate =
-                  (payment['paymentDate'] as Timestamp).toDate();
-              String userRole = payment['userRole'];
-              String documentId = payment.id; // Get the document ID
+      body: paymentItems.isEmpty
+          ? const Center(child: Text('No payment data available.'))
+          : ListView.builder(
+              itemCount: paymentItems.length,
+              itemBuilder: (context, index) {
+                var payment = paymentItems[index];
 
-              // Use the null coalescing operator (??) to provide a default value if photoUrl is null
-              String defaultPhotoUrl =
-                  'assets/default.jpg'; // Change this to your desired default URL
-
-              return PaymentItem(
-                payment['username'],
-                paymentDate,
-                photoUrl ?? defaultPhotoUrl,
-                userRole,
-                documentId,
-              );
-            }).toList();
-          }
-          return ListView.builder(
-            itemCount: paymentItems.length,
-            itemBuilder: (context, index) {
-              var payment = paymentItems[index];
-
-              return Card(
-                margin: const EdgeInsets.all(8),
-                child: ListTile(
-                  title: Text('Username: ${payment.username} paid'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Payment Date: ${DateFormat('yyyy/MM/dd').format(payment.paymentDate)}',
-                      ),
-                      Text('User Role: ${payment.userRole}'),
-                    ],
+                return Card(
+                  margin: const EdgeInsets.all(8),
+                  child: ListTile(
+                    title: Text('Username: ${payment.username} paid'),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Payment Date: ${DateFormat('yyyy/MM/dd').format(payment.paymentDate)}',
+                        ),
+                        Text('User Role: ${payment.userRole}'),
+                      ],
+                    ),
+                    leading: GestureDetector(
+                      onTap: () {
+                        if (payment.photoUrl != 'assets/default.jpg') {
+                          _showImageDialog(context, payment.photoUrl);
+                        } else {
+                          // Handle the case where the image is the default asset (optional)
+                        }
+                      },
+                      child: payment.photoUrl != 'assets/default.jpg'
+                          ? Image.network(
+                              payment.photoUrl,
+                              width: 80,
+                              height: 80,
+                            )
+                          : Image.asset(
+                              payment.photoUrl,
+                              width: 80,
+                              height: 80,
+                            ),
+                    ),
+                    trailing: ElevatedButton(
+                      onPressed: () {
+                        handleConfirmation(payment);
+                      },
+                      child: const Text('Confirm'),
+                    ),
                   ),
-                  leading: GestureDetector(
-                    onTap: () {
-                      if (payment.photoUrl != 'assets/default.jpg') {
-                        _showImageDialog(context, payment.photoUrl);
-                      } else {
-                        // Handle the case where the image is the default asset (optional)
-                      }
-                    },
-                    child: payment.photoUrl != 'assets/default.jpg'
-                        ? Image.network(
-                            payment.photoUrl,
-                            width: 80,
-                            height: 80,
-                          )
-                        : Image.asset(
-                            payment
-                                .photoUrl, // Use Image.asset for local assets
-                            width: 80,
-                            height: 80,
-                          ),
-                  ),
-                  trailing: ElevatedButton(
-                    onPressed: () {
-                      handleConfirmation(payment);
-                    },
-                    child: const Text('Confirm'),
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
+                );
+              },
+            ),
     );
   }
 
-  Future<QuerySnapshot> fetchPayments() async {
-    return FirebaseFirestore.instance.collection('payments').get();
+  Future<List<PaymentItem>> fetchPayments() async {
+    var querySnapshot =
+        await FirebaseFirestore.instance.collection('payments').get();
+
+    return querySnapshot.docs.map((payment) {
+      String? photoUrl = payment['photoUrl'] as String?;
+      DateTime paymentDate = (payment['paymentDate'] as Timestamp).toDate();
+      String userRole = payment['userRole'];
+      String documentId = payment.id;
+
+      String defaultPhotoUrl = 'assets/default.jpg';
+
+      return PaymentItem(
+        payment['username'],
+        paymentDate,
+        photoUrl ?? defaultPhotoUrl,
+        userRole,
+        documentId,
+      );
+    }).toList();
   }
 
-  void handleConfirmation(PaymentItem payment) {
+  void handleConfirmation(PaymentItem payment) async {
     String confirmationMessage;
     Map<String, dynamic> updateData = {};
 
@@ -142,12 +128,16 @@ class _AdminPaymentsState extends State<AdminPayments> {
       updateData['confirmDate'] = Timestamp.now();
     }
 
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('payments')
         .doc(payment.documentId)
         .update({
       'confirmed': true,
       ...updateData,
+    });
+
+    setState(() {
+      paymentItems.remove(payment);
     });
 
     showDialog(
