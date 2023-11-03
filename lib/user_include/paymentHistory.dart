@@ -35,6 +35,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
 
           return Scaffold(
             appBar: AppBar(
+              backgroundColor: Colors.black,
               title: const Text('Payment History'),
             ),
             body: FutureBuilder<List<PaymentInfo>>(
@@ -55,8 +56,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                         DateFormat('yyyy/MM/dd').format(paymentDate);
 
                     return ListTile(
-                      title: Text('Payment Date: $formattedDate'),
-                      subtitle: _buildSubtitle(paymentHistory[index], userRole),
+                      title: _buildSubtitle(paymentHistory[index], userRole),
+                      subtitle: Text('Payment Date: $formattedDate'),
                     );
                   },
                 );
@@ -75,8 +76,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Confirm Month: ${paymentInfo.confirmMonth ?? "N/A"}'),
           Text('Confirmed: ${paymentInfo.confirmed}'),
+          Text('Confirm Month: ${paymentInfo.confirmMonth ?? "N/A"}'),
         ],
       );
     } else if (userRole == "Non-Permanent") {
