@@ -11,9 +11,7 @@ import 'package:lego/user_include/payment_details.dart';
 import 'package:lottie/lottie.dart';
 
 class UserMainPage extends StatefulWidget {
-  const UserMainPage({
-    Key? key,
-  }) : super(key: key);
+  const UserMainPage({Key? key}) : super(key: key);
 
   @override
   State<UserMainPage> createState() => _UserMainPageState();
@@ -27,8 +25,9 @@ class _UserMainPageState extends State<UserMainPage>
   @override
   void initState() {
     super.initState();
-    _fetchWeather();
-    fetchUserName();
+    fetchUserName().then((_) {
+      fetchWeather();
+    });
   }
 
   Future<void> fetchUserName() async {
@@ -48,12 +47,10 @@ class _UserMainPageState extends State<UserMainPage>
     }
   }
 
-  //todo:api key
-  final _weatherService = WeatherService('f2f0d40bb2beaf83b396318ee2bb419c');
+  final _weatherService = WeatherService('527261e93132a5f1fd76aae5d40dbc3f');
   Weather? _weather;
 
-  //todo:fectch weather
-  _fetchWeather() async {
+  fetchWeather() async {
     String cityName = (await _weatherService.getCurrentDistrict()).trim();
 
     if (cityName == "Moneragala") {
@@ -62,7 +59,9 @@ class _UserMainPageState extends State<UserMainPage>
 
     try {
       final weather = await _weatherService.getWeather(cityName);
-      _weather = weather;
+      setState(() {
+        _weather = weather;
+      });
     } catch (e) {
       print(e);
     }
@@ -154,7 +153,7 @@ class _UserMainPageState extends State<UserMainPage>
                           Text(
                             _weather?.mainCondition ?? "",
                             style: const TextStyle(fontWeight: FontWeight.bold),
-                          ) // Make sure 'temperature' is a property in your Weather model.
+                          ),
                         ],
                       ),
                     ),
@@ -187,7 +186,6 @@ class _UserMainPageState extends State<UserMainPage>
                             title: "JOURNEY",
                             icon: 'assets/go.png',
                             onTap: () {
-                              // Handle the JOURNEY card onTap action
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -204,7 +202,6 @@ class _UserMainPageState extends State<UserMainPage>
                             title: "LOCATION",
                             icon: 'assets/map.png',
                             onTap: () {
-                              // Handle the LOCATION card onTap action
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -243,7 +240,6 @@ class _UserMainPageState extends State<UserMainPage>
                             title: "PAYMENT DETAILS",
                             icon: 'assets/cashless-payment.png',
                             onTap: () {
-                              // Handle the PAYMENT DETAILS card onTap action
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -256,7 +252,7 @@ class _UserMainPageState extends State<UserMainPage>
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),

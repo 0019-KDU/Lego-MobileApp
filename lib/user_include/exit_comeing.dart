@@ -218,63 +218,61 @@ class _ComeGoingState extends State<ComeGoing> {
         key: _fromkey,
         child: Column(
           children: [
-            Container(
-              margin: const EdgeInsets.all(10),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [],
-              ),
+            const SizedBox(
+              height: 10,
             ),
             Container(
-              margin: const EdgeInsets.all(30),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.all(20),
-              child: Column(
+              margin: const EdgeInsets.all(10),
+              child: Row(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Radio(
-                        value: 'Going',
-                        groupValue: tripType,
-                        onChanged: (value) {
-                          setState(() {
-                            tripType = value;
-                          });
-                        },
-                      ),
-                      const Text(
-                        'S-H',
+                  Expanded(
+                    child: RadioListTile(
+                      contentPadding: const EdgeInsets.all(5.0),
+                      value: 'Going',
+                      groupValue: tripType,
+                      dense: true,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5)),
+                      tileColor: Colors.black12,
+                      title: const Text(
+                        "Suriyawawa To Home",
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 15,
                         ),
                       ),
-                      const SizedBox(
-                        width: 20,
+                      onChanged: (value) {
+                        setState(() {
+                          tripType = value;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 3,
+                  ),
+                  Expanded(
+                    child: RadioListTile(
+                      contentPadding: const EdgeInsets.all(5.0),
+                      value: 'Coming',
+                      groupValue: tripType,
+                      dense: true,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5)),
+                      tileColor: Colors.black12,
+                      title: const Text(
+                        "Home To Suriyawawa",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 15,
+                        ),
                       ),
-                      Radio(
-                        value: 'Coming',
-                        groupValue: tripType,
-                        onChanged: (value) {
-                          setState(() {
-                            tripType = value;
-                          });
-                        },
-                      ),
-                      const Text('H-S',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                    ],
+                      onChanged: (value) {
+                        setState(() {
+                          tripType = value;
+                        });
+                      },
+                    ),
                   ),
                 ],
               ),
