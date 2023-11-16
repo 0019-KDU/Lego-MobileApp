@@ -22,6 +22,10 @@ class _d_attendanceState extends State<d_attendance> {
 
   Future<void> _calculateDestinationCounts() async {
     try {
+      if (!mounted) {
+        return;
+      }
+
       final currentTime = DateTime.now();
       final startOfDay =
           DateTime(currentTime.year, currentTime.month, currentTime.day);
@@ -32,19 +36,36 @@ class _d_attendanceState extends State<d_attendance> {
       final comingValuesCollection =
           FirebaseFirestore.instance.collection("coming_values");
 
+      if (!mounted) {
+        return;
+      }
+
       final goingQuerySnapshot = await goingValuesCollection
           .where("timestamp",
               isGreaterThanOrEqualTo: startOfDay, isLessThan: endOfDay)
           .get();
+
+      if (!mounted) {
+        return;
+      }
+
       final comingQuerySnapshot = await comingValuesCollection
           .where("timestamp",
               isGreaterThanOrEqualTo: startOfDay, isLessThan: endOfDay)
           .get();
 
+      if (!mounted) {
+        return;
+      }
+
       if (goingQuerySnapshot.docs.isNotEmpty &&
           comingQuerySnapshot.docs.isNotEmpty) {
         final List<DocumentSnapshot> goingDocs = goingQuerySnapshot.docs;
         final List<DocumentSnapshot> comingDocs = comingQuerySnapshot.docs;
+
+        if (!mounted) {
+          return;
+        }
 
         goingDestinationCounts = _countDestinations(goingDocs);
         comingDestinationCounts = _countDestinations(comingDocs);
@@ -58,13 +79,25 @@ class _d_attendanceState extends State<d_attendance> {
 
         approvedCount = await calculateApprovedCountForCurrentWeek();
 
+        if (!mounted) {
+          return;
+        }
+
         setState(() {});
       } else {
+        if (!mounted) {
+          return;
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("No data found for the current day."),
         ));
       }
     } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       print("Error in _calculateDestinationCounts: $error");
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content:
@@ -74,29 +107,46 @@ class _d_attendanceState extends State<d_attendance> {
   }
 
   Future<int> calculateApprovedCountForCurrentWeek() async {
-    final DateTime now = DateTime.now();
-    final DateTime startOfWeek = now.subtract(Duration(days: now.weekday));
-    final DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
-
-    final snapshot = await FirebaseFirestore.instance
-        .collection('request_history')
-        .where("status", isEqualTo: "approved")
-        .where("timestamp", isGreaterThanOrEqualTo: startOfWeek)
-        .where("timestamp", isLessThanOrEqualTo: endOfWeek)
-        .get();
-
-    int totalApprovedSeats = 0;
-
-    for (final doc in snapshot.docs) {
-      final status = doc.get("status") as String?;
-      final requestedSeats = doc.get("requestedSeats") as int?;
-
-      if (status == "approved" && requestedSeats != null) {
-        totalApprovedSeats += requestedSeats;
+    try {
+      if (!mounted) {
+        return 0;
       }
-    }
 
-    return totalApprovedSeats;
+      final DateTime now = DateTime.now();
+      final DateTime startOfWeek = now.subtract(Duration(days: now.weekday));
+      final DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection('request_history')
+          .where("status", isEqualTo: "approved")
+          .where("timestamp", isGreaterThanOrEqualTo: startOfWeek)
+          .where("timestamp", isLessThanOrEqualTo: endOfWeek)
+          .get();
+
+      if (!mounted) {
+        return 0;
+      }
+
+      int totalApprovedSeats = 0;
+
+      for (final doc in snapshot.docs) {
+        final status = doc.get("status") as String?;
+        final requestedSeats = doc.get("requestedSeats") as int?;
+
+        if (status == "approved" && requestedSeats != null) {
+          totalApprovedSeats += requestedSeats;
+        }
+      }
+
+      return totalApprovedSeats;
+    } catch (error) {
+      if (!mounted) {
+        return 0;
+      }
+
+      print("Error in calculateApprovedCountForCurrentWeek: $error");
+      return 0;
+    }
   }
 
   Map<String, int> _countDestinations(List<DocumentSnapshot> docs) {
@@ -134,9 +184,14 @@ class _d_attendanceState extends State<d_attendance> {
                     value: true,
                     groupValue: showGoingValues,
                     onChanged: (value) {
+                      if (!mounted) {
+                        return;
+                      }
+
                       setState(() {
                         showGoingValues = true;
                       });
+
                       _calculateDestinationCounts();
                     },
                   ),
@@ -145,9 +200,14 @@ class _d_attendanceState extends State<d_attendance> {
                     value: false,
                     groupValue: showGoingValues,
                     onChanged: (value) {
+                      if (!mounted) {
+                        return;
+                      }
+
                       setState(() {
                         showGoingValues = false;
                       });
+
                       _calculateDestinationCounts();
                     },
                   ),
