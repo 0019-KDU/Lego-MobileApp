@@ -3,10 +3,12 @@ import 'package:lego/authentication/auth_helper.dart';
 import 'package:lego/screen/profile.dart';
 
 class MyDrawer extends StatelessWidget {
-  const MyDrawer({
-    super.key,
-  });
+  final OnUsernameChangedCallback onUsernameChanged;
 
+  const MyDrawer({
+    Key? key,
+    required this.onUsernameChanged,
+  }) : super(key: key);
 // Function to handle the log out action
 
   @override
@@ -30,7 +32,8 @@ class MyDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ProfilePage(),
+                  builder: (context) =>
+                      ProfilePage(onUsernameChanged: onUsernameChanged),
                 ),
               );
             },

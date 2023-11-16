@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lego/components/drawer.dart';
 import 'package:lego/driver_include/d_attendance.dart';
 import 'package:lego/driver_include/location_service.dart';
 import 'package:lego/screen/driver.dart';
@@ -111,7 +110,6 @@ class _DriverMainPageState extends State<DriverMainPage>
           ),
         ),
       ),
-      endDrawer: const MyDrawer(),
     );
   }
 

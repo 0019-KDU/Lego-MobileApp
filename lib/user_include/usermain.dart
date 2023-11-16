@@ -47,6 +47,12 @@ class _UserMainPageState extends State<UserMainPage>
     }
   }
 
+  void _updateUsername(String newUsername) {
+    setState(() {
+      userName = newUsername;
+    });
+  }
+
   final _weatherService = WeatherService('527261e93132a5f1fd76aae5d40dbc3f');
   Weather? _weather;
 
@@ -257,7 +263,7 @@ class _UserMainPageState extends State<UserMainPage>
           ),
         ),
       ),
-      endDrawer: const MyDrawer(),
+      endDrawer: MyDrawer(onUsernameChanged: _updateUsername),
     );
   }
 

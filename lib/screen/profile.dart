@@ -3,11 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lego/components/text_box.dart';
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({
-    super.key,
-  });
+typedef OnUsernameChangedCallback = void Function(String newUsername);
 
+class ProfilePage extends StatefulWidget {
+  final OnUsernameChangedCallback onUsernameChanged;
+
+  const ProfilePage({Key? key, required this.onUsernameChanged})
+      : super(key: key);
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
@@ -16,7 +18,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final currentUser = FirebaseAuth.instance.currentUser!;
   final userCollection = FirebaseFirestore.instance.collection('users');
 
-  Future<void> editField(String field) async {
+  Future<void> editField(String field,
+      {required OnUsernameChangedCallback onUsernameChanged}) async {
     String? newValue = '';
 
     await showDialog(
@@ -55,7 +58,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 await userCollection
                     .doc(currentUser.uid)
                     .update({field: newValue});
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
+                onUsernameChanged(newValue!); // Close the dialog
               } else {
                 // Handle the case where newValue is empty or null
                 print('Invalid input for newValue');
@@ -122,7 +126,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 MyTextBox(
                   text: userData['username'],
                   sectionName: 'Username',
-                  onPressed: () => editField('username'), // Fix typo here
+                  onPressed: () => editField('username',
+                      onUsernameChanged: widget.onUsernameChanged),
                 ),
                 MyTextBox(
                   text: userData['rool'],

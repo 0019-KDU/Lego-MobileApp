@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
       home: isLoggedIn ? const UserMainPage() : const LoginPage(),
       // Add DriverMainPage as an option in your app's navigation
       routes: {
-        '/driverMain': (context) => DriverMainPage(),
+        '/driverMain': (context) => const DriverMainPage(),
       },
     );
   }
