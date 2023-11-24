@@ -208,6 +208,100 @@ class _ComeGoingState extends State<ComeGoing> {
     _fromkey = GlobalKey<FormState>();
   }
 
+  String? selectedGoingValue; // Variable for "Suriyawawa To Home"
+  String? selectedComingValue; // Variable for "Home To Suriyawawa"
+
+  Widget _buildSelectedValues() {
+    return FutureBuilder(
+      future: _getSelectedValuesForCurrentDay(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          Map<String, dynamic>? values = snapshot.data as Map<String, dynamic>?;
+
+          if (values != null) {
+            String goingValue = values['going'] ?? 'Not selected';
+            String comingValue = values['coming'] ?? 'Not selected';
+
+            return Column(
+              children: [
+                Text(
+                  "Suriyawawa To Home: $goingValue",
+                ),
+                Text(
+                  "Home To Suriyawawa: $comingValue",
+                ),
+              ],
+            );
+          } else {
+            return const Text('No data found for the current day.');
+          }
+        }
+      },
+    );
+  }
+
+  Future<Map<String, dynamic>?> _getSelectedValuesForCurrentDay() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+
+      if (currentUser != null) {
+        final goingCollection =
+            FirebaseFirestore.instance.collection("going_values");
+        final comingCollection =
+            FirebaseFirestore.instance.collection("coming_values");
+
+        DateTime currentDate = DateTime.now();
+        Timestamp startOfDay = Timestamp.fromDate(
+            DateTime(currentDate.year, currentDate.month, currentDate.day));
+
+        print("startOfDay: $startOfDay");
+        print("currentDate: $currentDate");
+
+        final goingSnapshot = await goingCollection
+            .where("userId", isEqualTo: currentUser.uid)
+            .where("timestamp", isGreaterThanOrEqualTo: startOfDay)
+            .where("timestamp",
+                isLessThan: Timestamp.fromDate(
+                    currentDate.add(const Duration(days: 1))))
+            .get();
+
+        final comingSnapshot = await comingCollection
+            .where("userId", isEqualTo: currentUser.uid)
+            .where("timestamp", isGreaterThanOrEqualTo: startOfDay)
+            .where("timestamp",
+                isLessThan: Timestamp.fromDate(
+                    currentDate.add(const Duration(days: 1))))
+            .get();
+
+        if (goingSnapshot.docs.isNotEmpty || comingSnapshot.docs.isNotEmpty) {
+          Map<String, dynamic> values = {};
+
+          if (goingSnapshot.docs.isNotEmpty) {
+            values['going'] = goingSnapshot.docs.first.data()['selectedValue'];
+          }
+
+          if (comingSnapshot.docs.isNotEmpty) {
+            values['coming'] =
+                comingSnapshot.docs.first.data()['selectedValue'];
+          }
+
+          print("Retrieved values: $values");
+          return values;
+        } else {
+          print("No documents found for the current day.");
+        }
+      }
+    } catch (e) {
+      print("Error in _getSelectedValuesForCurrentDay: $e");
+    }
+
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -371,26 +465,33 @@ class _ComeGoingState extends State<ComeGoing> {
                 ],
               ),
             ),
-            Container(
-              margin: const EdgeInsets.all(30),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green.shade400,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(32.0),
-                  ),
-                  minimumSize: const Size(90, 45),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AttendanceHistoryScreen(),
+            Column(
+              children: [
+                // New widget to display selected values
+
+                Container(
+                  margin: const EdgeInsets.all(30),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.shade400,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32.0),
+                      ),
+                      minimumSize: const Size(90, 45),
                     ),
-                  );
-                },
-                child: const Text("History"),
-              ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AttendanceHistoryScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text("History"),
+                  ),
+                ),
+                _buildSelectedValues(),
+              ],
             ),
           ],
         ),

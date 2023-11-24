@@ -334,9 +334,3 @@ class _EditInformationState extends State<EditInformation> {
     super.dispose();
   }
 }
-
-void main() {
-  runApp(MaterialApp(
-    home: EditInformation(),
-  ));
-}
