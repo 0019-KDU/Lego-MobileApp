@@ -358,7 +358,7 @@ class _LoginPageState extends State<LoginPage> {
         .get()
         .then((DocumentSnapshot documentSnapshot) async {
       if (documentSnapshot.exists) {
-        if (documentSnapshot.get('rool') == "admin") {
+        if (documentSnapshot.get('rool') == "Admin") {
           final SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setBool('isLoggedIn', true);
           Navigator.pushReplacement(

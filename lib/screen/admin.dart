@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lego/admin_include/additional.dart';
 import 'package:lego/admin_include/daily_attendance.dart';
+import 'package:lego/admin_include/editinformation.dart';
 import 'package:lego/admin_include/location_page.dart';
 import 'package:lego/admin_include/payment.dart';
 import 'package:lego/admin_include/sendnotificationscreen.dart';
@@ -90,26 +91,61 @@ class _AdminPageState extends State<AdminPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              "Dashboard",
-                              style: TextStyle(
-                                  fontSize: 35,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                  letterSpacing: 1),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        "Dashboard",
+                                        style: TextStyle(
+                                            fontSize: 35,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                            letterSpacing: 1),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        DateFormat('MMMM d, y')
+                                            .format(DateTime.now()),
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white54,
+                                          fontWeight: FontWeight.w500,
+                                          letterSpacing: 1,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    // Navigate to the edit page
+                                    // Add your navigation logic here
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const EditInformation(),
+                                      ),
+                                    );
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Icon(
+                                      Icons.edit,
+                                      color: Colors.white,
+                                      size: 30,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              DateFormat('MMMM d, y').format(DateTime.now()),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.white54,
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 1,
-                              ),
-                            )
                           ],
                         ),
                       ),
