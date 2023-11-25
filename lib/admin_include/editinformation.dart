@@ -65,14 +65,14 @@ class _EditInformationState extends State<EditInformation> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Success'),
-          content: Text('Prices submitted successfully.'),
+          title: const Text('Success'),
+          content: const Text('Prices submitted successfully.'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -86,7 +86,7 @@ class _EditInformationState extends State<EditInformation> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Error'),
+          title: const Text('Error'),
           content:
               Text('Error submitting prices to the database: $errorMessage'),
           actions: [
@@ -94,7 +94,7 @@ class _EditInformationState extends State<EditInformation> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -161,11 +161,11 @@ class _EditInformationState extends State<EditInformation> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Edit Information'),
+          title: const Text('Edit Information'),
         ),
         body: Container(
           color: Colors.white,
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -173,9 +173,9 @@ class _EditInformationState extends State<EditInformation> {
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.blue),
-                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
                 ),
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
                     const Center(
@@ -192,18 +192,18 @@ class _EditInformationState extends State<EditInformation> {
                     Center(
                       child: TextField(
                         controller: _firstEditingController,
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         inputFormatters: <TextInputFormatter>[
                           FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                         ],
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Enter new price here',
                           border: OutlineInputBorder(),
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Center(
                       child: ElevatedButton(
                         onPressed: () {
@@ -211,14 +211,14 @@ class _EditInformationState extends State<EditInformation> {
                           submitFirstToDatabase(_firstEditingController.text);
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          onPrimary: Colors.white,
-                          padding: EdgeInsets.all(16.0),
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.blue,
+                          padding: const EdgeInsets.all(16.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
-                        child: Text(
+                        child: const Text(
                           'Submit ',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
@@ -231,13 +231,13 @@ class _EditInformationState extends State<EditInformation> {
                   ],
                 ),
               ),
-              SizedBox(height: 70),
+              const SizedBox(height: 70),
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.green),
-                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
                 ),
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
                     const Center(
@@ -250,22 +250,22 @@ class _EditInformationState extends State<EditInformation> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Center(
                       child: TextField(
                         controller: _secondEditingController,
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         inputFormatters: <TextInputFormatter>[
                           FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                         ],
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Enter new price here',
                           border: OutlineInputBorder(),
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Center(
                       child: ElevatedButton(
                         onPressed: () {
@@ -273,14 +273,14 @@ class _EditInformationState extends State<EditInformation> {
                           submitSecondToDatabase(_secondEditingController.text);
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.green,
-                          onPrimary: Colors.white,
-                          padding: EdgeInsets.all(16.0),
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.green,
+                          padding: const EdgeInsets.all(16.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
-                        child: Text(
+                        child: const Text(
                           'Submit ',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
@@ -293,28 +293,28 @@ class _EditInformationState extends State<EditInformation> {
                   ],
                 ),
               ),
-              SizedBox(height: 50),
+              const SizedBox(height: 50),
               Center(
                 child: previousFirstPrice != null
                     ? Text(
                         'Price of Permanent Member: Rs.$previousFirstPrice',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 19, // Increased font size
-                          color: const Color.fromARGB(255, 0, 0, 0),
+                          color: Color.fromARGB(255, 0, 0, 0),
                         ),
                       )
                     : Container(),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Center(
                 child: previousSecondPrice != null
                     ? Text(
                         'Price of Non-permanent Member: Rs.$previousSecondPrice',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 19, // Increased font size
-                          color: const Color.fromARGB(255, 0, 0, 0),
+                          color: Color.fromARGB(255, 0, 0, 0),
                         ),
                       )
                     : Container(),
