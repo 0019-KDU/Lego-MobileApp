@@ -47,7 +47,7 @@ class _EditInformationState extends State<EditInformation> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Information'),
+        title: const Text('Edit Information'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -63,7 +63,7 @@ class _EditInformationState extends State<EditInformation> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Align(
+                  const Align(
                     alignment: Alignment.center,
                     child: Text(
                       'Price of Permanent Member',
@@ -71,34 +71,35 @@ class _EditInformationState extends State<EditInformation> {
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   TextFormField(
                     controller: permanentCostController,
                     keyboardType: TextInputType.number,
-                    decoration:
-                        InputDecoration(labelText: 'Enter new price here'),
+                    decoration: const InputDecoration(
+                        labelText: 'Enter new price here'),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Align(
                     alignment: Alignment.center,
                     child: ElevatedButton(
                       onPressed: () {
                         updateCost('permant', permanentCostController.text);
                       },
-                      child: Text('Save Changes'),
+                      child: const Text('Save Changes'),
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   previousPermanentCost != null
                       ? Text(
                           'Current Price of Permanent Member: $previousPermanentCost',
-                          style: TextStyle(fontSize: 16, color: Colors.blue),
+                          style:
+                              const TextStyle(fontSize: 16, color: Colors.blue),
                         )
-                      : SizedBox.shrink(),
+                      : const SizedBox.shrink(),
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -108,7 +109,7 @@ class _EditInformationState extends State<EditInformation> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Align(
+                  const Align(
                     alignment: Alignment.center,
                     child: Text(
                       'Price of Non-Permanent Member',
@@ -116,14 +117,14 @@ class _EditInformationState extends State<EditInformation> {
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   TextFormField(
                     controller: nonPermanentCostController,
                     keyboardType: TextInputType.number,
-                    decoration:
-                        InputDecoration(labelText: 'Enter new price here'),
+                    decoration: const InputDecoration(
+                        labelText: 'Enter new price here'),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Align(
                     alignment: Alignment.center,
                     child: ElevatedButton(
@@ -131,16 +132,17 @@ class _EditInformationState extends State<EditInformation> {
                         updateCost(
                             'non_permant', nonPermanentCostController.text);
                       },
-                      child: Text('Save Changes'),
+                      child: const Text('Save Changes'),
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   previousNonPermanentCost != null
                       ? Text(
                           'Current Price of Non-Permanent Member: $previousNonPermanentCost',
-                          style: TextStyle(fontSize: 16, color: Colors.blue),
+                          style:
+                              const TextStyle(fontSize: 16, color: Colors.blue),
                         )
-                      : SizedBox.shrink(),
+                      : const SizedBox.shrink(),
                 ],
               ),
             ),
@@ -187,13 +189,13 @@ class _EditInformationState extends State<EditInformation> {
       });
 
       // Show a success message or navigate back to the previous screen
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('New price updated successfully.'),
       ));
     } catch (error) {
       // Handle errors
       print('Error updating cost: $error');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Error updating cost. Please try again.'),
       ));
     }

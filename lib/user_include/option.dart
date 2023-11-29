@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lego/components/nm_box.dart';
 
 class SeatRequestScreen extends StatefulWidget {
@@ -68,6 +68,7 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
     return null;
   }
 
+  bool showRequestDetails = true;
   @override
   Widget build(BuildContext context) {
     final user = _auth.currentUser;
@@ -75,6 +76,7 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          title: const Text("Seat Request"),
           backgroundColor: Colors.black,
         ),
         backgroundColor: mC,
@@ -139,116 +141,166 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.blue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-                onPressed: () async {
-                  if (user == null) {
-                    // User is not authenticated
-                    return;
-                  }
-
-                  // Validate the purpose field
-                  if (purpose.trim().isEmpty) {
-                    // Show an error message if the purpose is empty
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Purpose cannot be empty.'),
+              const SizedBox(height: 30),
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceEvenly, // Adjust as needed
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
-                    );
-                    return; // Don't submit the request
-                  }
-
-                  final lastRequest = await getLastRequest(user.uid);
-
-                  if (lastRequest == null ||
-                      canMakeNewRequest(lastRequest['timestamp'])) {
-                    final price = await getSeatPrice(
-                        requestedSeats); // Get the seat price
-                    await submitRequest(user.uid, requestedSeats, purpose);
-
-                    // Clear the input fields
-                    setState(() {
-                      requestedSeats = 0;
-                      purpose = '';
-                      _purposeController.clear();
-                    });
-
-                    // Show a snackbar indicating the request is pending
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                            'Request submitted and pending. Cost: \$$price'),
-                      ),
-                    );
-                  } else {
-                    // User cannot make a new request
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Request Limit Reached'),
-                          content: const Text(
-                              'You cannot make a new request at this time.'),
-                          actions: <Widget>[
-                            TextButton(
-                              child: const Text('OK'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }
-                },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 10.0,
-                    horizontal: 20.0,
-                  ),
-                  child: Text('Submit Request'),
-                ),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.red,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-                onPressed: () async {
-                  if (user == null) {
-                    // User is not authenticated
-                    return;
-                  }
-
-                  await deleteRequest(user.uid);
-
-                  // Show a snackbar indicating the request is deleted
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Request deleted.'),
                     ),
-                  );
-                },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 10.0,
-                    horizontal: 20.0,
+                    onPressed: () async {
+                      if (user == null) {
+                        // User is not authenticated
+                        return;
+                      }
+
+                      // Validate the purpose field
+                      if (purpose.trim().isEmpty) {
+                        // Show an error message if the purpose is empty
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Purpose cannot be empty.'),
+                          ),
+                        );
+                        return; // Don't submit the request
+                      }
+
+                      final lastRequest = await getLastRequest(user.uid);
+
+                      if (lastRequest == null ||
+                          canMakeNewRequest(lastRequest['timestamp'])) {
+                        final price = await getSeatPrice(
+                            requestedSeats); // Get the seat price
+                        await submitRequest(user.uid, requestedSeats, purpose);
+
+                        // Clear the input fields
+                        setState(() {
+                          requestedSeats = 0;
+                          purpose = '';
+                          _purposeController.clear();
+                        });
+
+                        // Show a snackbar indicating the request is pending
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Request submitted and pending. Cost: \$$price'),
+                          ),
+                        );
+                      } else {
+                        // User cannot make a new request
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Request Limit Reached'),
+                              content: const Text(
+                                  'You cannot make a new request at this time.'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text('OK'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 10.0,
+                        horizontal: 20.0,
+                      ),
+                      child: Text('Submit Request'),
+                    ),
                   ),
-                  child: Text('Delete Request'),
-                ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    onPressed: () async {
+                      // Get the user
+                      final user = _auth.currentUser;
+
+                      if (user == null) {
+                        // User is not authenticated
+                        return;
+                      }
+
+                      // Get the last request document ID
+                      final lastRequestDocumentId =
+                          await getLastRequestDocumentId(user.uid);
+
+                      if (lastRequestDocumentId != null) {
+                        // Get the last request using the document ID
+                        final lastRequest = await FirebaseFirestore.instance
+                            .collection('seat_requests')
+                            .doc(lastRequestDocumentId)
+                            .get();
+
+                        if (lastRequest.exists) {
+                          // Delete the request
+                          await FirebaseFirestore.instance
+                              .collection('seat_requests')
+                              .doc(lastRequestDocumentId)
+                              .delete();
+
+                          // Save to RecycleHistory
+                          await saveToRecycleHistory(
+                            user.uid,
+                            lastRequest['requestedSeats'] as int,
+                            lastRequest['purpose'] as String,
+                          );
+
+                          // Show a snackbar indicating the request is deleted
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  'Request deleted and saved to RecycleHistory.'),
+                            ),
+                          );
+                        } else {
+                          // Document does not exist
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('No request found to delete.'),
+                            ),
+                          );
+                        }
+                      } else {
+                        // No last request document ID found
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('No request found to delete.'),
+                          ),
+                        );
+                      }
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 10.0,
+                        horizontal: 20.0,
+                      ),
+                      child: Text('Delete Request'),
+                    ),
+                  ),
+                ],
               ),
+
               const SizedBox(height: 20),
               // Display user requests and admin responses
               Expanded(
@@ -258,12 +310,15 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
                       .where('userId', isEqualTo: user?.uid)
                       .snapshots(),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else if (!snapshot.hasData ||
                         snapshot.data!.docs.isEmpty) {
+                      // Prevent vibration
+                      HapticFeedback
+                          .lightImpact(); // or HapticFeedback.heavyImpact();
                       return const Text('No seat requests found.');
                     } else {
                       final documents = snapshot.data!.docs;
@@ -300,22 +355,48 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
                                   onTap: () {
                                     // Handle ListTile tap if needed
                                   },
-                                  child: SizedBox(
-                                    height: 100, // Adjust the height as needed
-                                    child: ListTile(
-                                      title: Text(
-                                          'Requested Seats: $requestedSeats'),
-                                      subtitle: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                              'Purpose: ${documentData['purpose']}'),
-                                          Text(
-                                              'Admin Response: $adminResponse'),
-                                          Text('Cost: \$$cost'),
-                                        ],
-                                      ),
+                                  child: Container(
+                                    height: 120, // Adjust the height as needed
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(color: Colors.grey),
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            if (showRequestDetails)
+                                              Text(
+                                                'Requested Seats: $requestedSeats',
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            if (showRequestDetails)
+                                              Text(
+                                                'Purpose: ${documentData['purpose']}',
+                                                style: const TextStyle(
+                                                    fontSize: 15),
+                                              ),
+                                            if (showRequestDetails)
+                                              Text(
+                                                'Admin Response: $adminResponse',
+                                                style: const TextStyle(
+                                                    fontSize: 15),
+                                              ),
+                                            if (showRequestDetails)
+                                              Text(
+                                                'Cost: \$$cost',
+                                                style: const TextStyle(
+                                                    fontSize: 15),
+                                              ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 );
@@ -332,26 +413,37 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
               ),
 
               if (bannerMessage.isNotEmpty)
-                Container(
-                  // Customize the banner color
-                  padding: const EdgeInsets.all(16.0), // Add padding as needed
-                  child: Container(
-                    padding:
-                        const EdgeInsets.all(16.0), // Add padding as needed
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.black, // Set border color
-                        width: 2.0, // Set border width
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(
+                              10.0), // Adjust the radius as needed
+                        ),
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                bannerMessage,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            const Icon(
+                              Icons.history_sharp,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      bannerMessage,
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    ],
                   ),
                 ),
             ],
@@ -359,6 +451,21 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
         ),
       ),
     );
+  }
+
+  Future<String?> getLastRequestDocumentId(String userId) async {
+    final userRequests = await _firestore
+        .collection('seat_requests')
+        .where('userId', isEqualTo: userId)
+        .orderBy('timestamp', descending: true)
+        .limit(1)
+        .get();
+
+    if (userRequests.docs.isNotEmpty) {
+      return userRequests.docs.first.id;
+    } else {
+      return null;
+    }
   }
 
   Future<Map<String, dynamic>?> getLastRequest(String userId) async {
@@ -370,7 +477,12 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
         .get();
 
     if (userRequests.docs.isNotEmpty) {
-      return userRequests.docs.first.data() as Map<String, dynamic>;
+      final lastRequest =
+          userRequests.docs.first.data() as Map<String, dynamic>;
+      print("Last request data: $lastRequest");
+      return lastRequest;
+    } else {
+      print("No last request found");
     }
 
     return null;
@@ -389,24 +501,22 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
       'requestedSeats': requestedSeats,
       'purpose': purpose,
       'timestamp': Timestamp.now(),
+      'status': 'Pending', // Add a default status
     });
   }
 
-  Future<void> deleteRequest(String userId) async {
-    try {
-      final userRequests = await _firestore
-          .collection('seat_requests')
-          .where('userId', isEqualTo: userId)
-          .get();
+  Future<void> saveToRecycleHistory(
+      String? userId, int requestedSeats, String purpose) async {
+    if (userId != null) {
+      await _firestore.collection('RecycleHistory').add({
+        'userId': userId,
+        'requestedSeats': requestedSeats,
+        'purpose': purpose,
+        'timestamp': Timestamp.now(),
+      });
 
-      for (final request in userRequests.docs) {
-        await request.reference.delete();
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print("Error deleting request: $e");
-      }
-      // Handle the error here, e.g., display an error message to the user.
+      // Clear the purpose controller after saving to recycle history
+      _purposeController.clear();
     }
   }
 }
