@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class EditInformation extends StatefulWidget {
   const EditInformation({Key? key}) : super(key: key);
@@ -10,327 +9,201 @@ class EditInformation extends StatefulWidget {
 }
 
 class _EditInformationState extends State<EditInformation> {
-  TextEditingController _firstEditingController = TextEditingController();
-  TextEditingController _secondEditingController = TextEditingController();
-  String? previousFirstPrice;
-  String? previousSecondPrice;
+  final TextEditingController permanentCostController = TextEditingController();
+  final TextEditingController nonPermanentCostController =
+      TextEditingController();
 
-  // Function to handle the submission to the database for the first text box
-  void submitFirstToDatabase(String firstPrice) {
-    // Access Firestore instance
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    // Update the price in the "cost" document in the "permant" collection
-    firestore.collection('permant').doc('cost').update({
-      'price': firstPrice,
-      'timestamp': FieldValue.serverTimestamp(),
-    }).then((value) {
-      // Success
-      showSuccessDialog();
-      // Set the previously submitted first price
-      setState(() {
-        previousFirstPrice = firstPrice;
-      });
-    }).catchError((error) {
-      // Handle errors
-      showErrorDialog(error.toString());
-    });
-  }
-
-  // Function to handle the submission to the database for the second text box
-  void submitSecondToDatabase(String secondPrice) {
-    // Access Firestore instance
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    // Update the price in the "cost" document in the "non_permant" collection
-    firestore.collection('non_permant').doc('cost').update({
-      'price': secondPrice,
-      'timestamp': FieldValue.serverTimestamp(),
-    }).then((value) {
-      // Success
-      showSuccessDialog();
-      // Set the previously submitted second price
-      setState(() {
-        previousSecondPrice = secondPrice;
-      });
-    }).catchError((error) {
-      // Handle errors
-      showErrorDialog(error.toString());
-    });
-  }
-
-  // Function to show a success dialog
-  void showSuccessDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Success'),
-          content: const Text('Prices submitted successfully.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // Function to show an error dialog
-  void showErrorDialog(String errorMessage) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Error'),
-          content:
-              Text('Error submitting prices to the database: $errorMessage'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  String? previousPermanentCost;
+  String? previousNonPermanentCost;
 
   @override
   void initState() {
     super.initState();
-    // Fetch the previously submitted prices when the page is initialized
-    fetchPreviousPrices();
+    // Fetch and set the initial values from Firestore
+    fetchInitialValues();
   }
 
-  // Function to fetch the previously submitted prices
-  void fetchPreviousPrices() {
-    // Access Firestore instance
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
+  Future<void> fetchInitialValues() async {
+    try {
+      DocumentSnapshot permantSnapshot = await FirebaseFirestore.instance
+          .collection('permant')
+          .doc('cost')
+          .get();
+      DocumentSnapshot nonPermantSnapshot = await FirebaseFirestore.instance
+          .collection('non_permant')
+          .doc('cost')
+          .get();
 
-    // Fetch the "cost" document in the "permant" collection
-    firestore
-        .collection('permant')
-        .doc('cost')
-        .get()
-        .then((DocumentSnapshot documentSnapshot) {
-      if (documentSnapshot.exists) {
-        setState(() {
-          // Set the previously submitted first price
-          previousFirstPrice = documentSnapshot['price'];
-        });
-      }
-    }).catchError((error) {
-      print('Error fetching previous first price: $error');
-    });
-
-    // Fetch the "cost" document in the "non_permant" collection
-    firestore
-        .collection('non_permant')
-        .doc('cost')
-        .get()
-        .then((DocumentSnapshot documentSnapshot) {
-      if (documentSnapshot.exists) {
-        setState(() {
-          // Set the previously submitted second price
-          previousSecondPrice = documentSnapshot['price'];
-        });
-      }
-    }).catchError((error) {
-      print('Error fetching previous second price: $error');
-    });
+      setState(() {
+        previousPermanentCost = permantSnapshot['price'].toString();
+        previousNonPermanentCost = nonPermantSnapshot['price'].toString();
+      });
+    } catch (error) {
+      print('Error fetching initial values: $error');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      // WillPopScope to handle back button press
-      onWillPop: () async {
-        // Clear the previously submitted prices when navigating back
-        setState(() {
-          previousFirstPrice = null;
-          previousSecondPrice = null;
-        });
-        return true;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Edit Information'),
-        ),
-        body: Container(
-          color: Colors.white,
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue),
-                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                ),
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    const Center(
-                      child: Text(
-                        'Price of Permanent Member ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24, // Increased font size
-                          color: Color.fromARGB(255, 0, 0, 0),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: TextField(
-                        controller: _firstEditingController,
-                        keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true),
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                        ],
-                        decoration: const InputDecoration(
-                          labelText: 'Enter new price here',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Call the submit function for the first button when pressed
-                          submitFirstToDatabase(_firstEditingController.text);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: Colors.blue,
-                          padding: const EdgeInsets.all(16.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                        child: const Text(
-                          'Submit ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18, // Increased font size
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Edit Information'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(8.0),
               ),
-              const SizedBox(height: 70),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.green),
-                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                ),
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    const Center(
-                      child: Text(
-                        'Price of Non-Permanent Member ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24, // Increased font size
-                          color: Color.fromARGB(255, 0, 0, 0),
-                        ),
-                      ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Price of Permanent Member',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: TextField(
-                        controller: _secondEditingController,
-                        keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true),
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                        ],
-                        decoration: const InputDecoration(
-                          labelText: 'Enter new price here',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
+                  ),
+                  SizedBox(height: 10),
+                  TextFormField(
+                    controller: permanentCostController,
+                    keyboardType: TextInputType.number,
+                    decoration:
+                        InputDecoration(labelText: 'Enter new price here'),
+                  ),
+                  SizedBox(height: 20),
+                  Align(
+                    alignment: Alignment.center,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        updateCost('permant', permanentCostController.text);
+                      },
+                      child: Text('Save Changes'),
                     ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Call the submit function for the second button when pressed
-                          submitSecondToDatabase(_secondEditingController.text);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: Colors.green,
-                          padding: const EdgeInsets.all(16.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                        child: const Text(
-                          'Submit ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18, // Increased font size
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
+                  ),
+                  SizedBox(height: 10),
+                  previousPermanentCost != null
+                      ? Text(
+                          'Current Price of Permanent Member: $previousPermanentCost',
+                          style: TextStyle(fontSize: 16, color: Colors.blue),
+                        )
+                      : SizedBox.shrink(),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Price of Non-Permanent Member',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: 10),
+                  TextFormField(
+                    controller: nonPermanentCostController,
+                    keyboardType: TextInputType.number,
+                    decoration:
+                        InputDecoration(labelText: 'Enter new price here'),
+                  ),
+                  SizedBox(height: 20),
+                  Align(
+                    alignment: Alignment.center,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        updateCost(
+                            'non_permant', nonPermanentCostController.text);
+                      },
+                      child: Text('Save Changes'),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  previousNonPermanentCost != null
+                      ? Text(
+                          'Current Price of Non-Permanent Member: $previousNonPermanentCost',
+                          style: TextStyle(fontSize: 16, color: Colors.blue),
+                        )
+                      : SizedBox.shrink(),
+                ],
               ),
-              const SizedBox(height: 50),
-              Center(
-                child: previousFirstPrice != null
-                    ? Text(
-                        'Price of Permanent Member: Rs.$previousFirstPrice',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 19, // Increased font size
-                          color: Color.fromARGB(255, 0, 0, 0),
-                        ),
-                      )
-                    : Container(),
-              ),
-              const SizedBox(height: 10),
-              Center(
-                child: previousSecondPrice != null
-                    ? Text(
-                        'Price of Non-permanent Member: Rs.$previousSecondPrice',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 19, // Increased font size
-                          color: Color.fromARGB(255, 0, 0, 0),
-                        ),
-                      )
-                    : Container(),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
+  Future<void> updateCost(String collectionName, String cost) async {
+    try {
+      // Validate if the cost is a valid double
+      if (double.tryParse(cost) == null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content:
+              Text('Please enter a valid number for $collectionName cost.'),
+        ));
+        return;
+      }
+
+      // Get the current price before the update
+      String? previousCost;
+      if (collectionName == 'permant') {
+        previousCost = previousPermanentCost;
+      } else if (collectionName == 'non_permant') {
+        previousCost = previousNonPermanentCost;
+      }
+
+      // Update the Firestore document
+      await FirebaseFirestore.instance
+          .collection(collectionName)
+          .doc('cost')
+          .update({
+        'price': double.parse(cost),
+      });
+
+      // Update the state to show the updated values
+      setState(() {
+        if (collectionName == 'permant') {
+          previousPermanentCost = cost;
+        } else if (collectionName == 'non_permant') {
+          previousNonPermanentCost = cost;
+        }
+      });
+
+      // Show a success message or navigate back to the previous screen
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('New price updated successfully.'),
+      ));
+    } catch (error) {
+      // Handle errors
+      print('Error updating cost: $error');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error updating cost. Please try again.'),
+      ));
+    }
+  }
+
   @override
   void dispose() {
     // Dispose the controllers when the widget is disposed
-    _firstEditingController.dispose();
-    _secondEditingController.dispose();
+    permanentCostController.dispose();
+    nonPermanentCostController.dispose();
     super.dispose();
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lego/authentication/auth_helper.dart';
 import 'package:lego/driver_include/d_attendance.dart';
 import 'package:lego/driver_include/location_service.dart';
 import 'package:lego/screen/driver.dart';
@@ -34,21 +35,39 @@ class _DriverMainPageState extends State<DriverMainPage>
           child: Column(
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
+                  Row(
+                    children: [
+                      GestureDetector(
+                        child: const Icon(
+                          Icons.bar_chart_rounded,
+                          color: Colors.indigo,
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'HI Driver',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.indigo,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Logout button
+                  InkWell(
+                    onTap: () {
+                      // Implement the logic to handle the logout action
+                      // For example, you can use AuthHelper to logout
+                      AuthHelper.instance.logout(context);
+                    },
                     child: const Icon(
-                      Icons.bar_chart_rounded,
+                      Icons.logout_rounded,
                       color: Colors.indigo,
                       size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'HI Driver',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.indigo,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
@@ -78,7 +97,8 @@ class _DriverMainPageState extends State<DriverMainPage>
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const DriverPage()),
+                                  builder: (context) => const DriverPage(),
+                                ),
                               );
                             },
                           ),
@@ -96,7 +116,8 @@ class _DriverMainPageState extends State<DriverMainPage>
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const d_attendance()),
+                                  builder: (context) => const d_attendance(),
+                                ),
                               );
                             },
                           ),
