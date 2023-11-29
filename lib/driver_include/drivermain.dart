@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lego/authentication/auth_helper.dart';
 import 'package:lego/driver_include/d_attendance.dart';
 import 'package:lego/driver_include/location_service.dart';
 import 'package:lego/screen/driver.dart';
 
 class DriverMainPage extends StatefulWidget {
-  const DriverMainPage({super.key});
+  const DriverMainPage({Key? key}) : super(key: key);
 
   @override
   State<DriverMainPage> createState() => _DriverMainPageState();
@@ -27,6 +28,9 @@ class _DriverMainPageState extends State<DriverMainPage>
 
   @override
   Widget build(BuildContext context) {
+    // Get the current date
+    String currentDate = DateFormat.yMMMMd().format(DateTime.now());
+
     return Scaffold(
       backgroundColor: Colors.indigo.shade50,
       body: SafeArea(
@@ -47,13 +51,26 @@ class _DriverMainPageState extends State<DriverMainPage>
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Text(
-                        'HI Driver',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.indigo,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'HI Driver',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.indigo,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            currentDate,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

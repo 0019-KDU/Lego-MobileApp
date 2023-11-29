@@ -58,41 +58,23 @@ class _d_attendanceState extends State<d_attendance> {
         return;
       }
 
-      if (goingQuerySnapshot.docs.isNotEmpty &&
-          comingQuerySnapshot.docs.isNotEmpty) {
-        final List<DocumentSnapshot> goingDocs = goingQuerySnapshot.docs;
-        final List<DocumentSnapshot> comingDocs = comingQuerySnapshot.docs;
+      goingDestinationCounts = _countDestinations(goingQuerySnapshot.docs);
+      comingDestinationCounts = _countDestinations(comingQuerySnapshot.docs);
 
-        if (!mounted) {
-          return;
-        }
+      final int totalGoingCount =
+          goingDestinationCounts.values.fold(0, (a, b) => a + b);
+      final int totalComingCount =
+          comingDestinationCounts.values.fold(0, (a, b) => a + b);
+      goingDestinationCounts['Total'] = totalGoingCount;
+      comingDestinationCounts['Total'] = totalComingCount;
 
-        goingDestinationCounts = _countDestinations(goingDocs);
-        comingDestinationCounts = _countDestinations(comingDocs);
+      approvedCount = await calculateApprovedCountForCurrentWeek();
 
-        final int totalGoingCount =
-            goingDestinationCounts.values.fold(0, (a, b) => a + b);
-        final int totalComingCount =
-            comingDestinationCounts.values.fold(0, (a, b) => a + b);
-        goingDestinationCounts['Total'] = totalGoingCount;
-        comingDestinationCounts['Total'] = totalComingCount;
-
-        approvedCount = await calculateApprovedCountForCurrentWeek();
-
-        if (!mounted) {
-          return;
-        }
-
-        setState(() {});
-      } else {
-        if (!mounted) {
-          return;
-        }
-
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("No data found for the current day."),
-        ));
+      if (!mounted) {
+        return;
       }
+
+      setState(() {});
     } catch (error) {
       if (!mounted) {
         return;
@@ -149,7 +131,7 @@ class _d_attendanceState extends State<d_attendance> {
     }
   }
 
-  Map<String, int> _countDestinations(List<DocumentSnapshot> docs) {
+  Map<String, int> _countDestinations(List<QueryDocumentSnapshot> docs) {
     final Map<String, int> destinationCounts = {};
 
     for (final doc in docs) {
@@ -218,14 +200,16 @@ class _d_attendanceState extends State<d_attendance> {
             const SizedBox(height: 20),
             _buildDestinationCountSection(
               showGoingValues
-                  ? "Southern to Home Destination Counts (Current Week):"
-                  : "Home to Southern Destination Counts (Current Week):",
+                  ? "Southern to Home Destination Counts (Current Day):"
+                  : "Home to Southern Destination Counts (Current Day):",
               showGoingValues
                   ? goingDestinationCounts
                   : comingDestinationCounts,
             ),
             const SizedBox(height: 20),
-            _buildTotalCountSection(),
+            _buildTotalCountSection(showGoingValues
+                ? goingDestinationCounts['Total'] ?? 0
+                : comingDestinationCounts['Total'] ?? 0),
           ],
         ),
       ),
@@ -265,9 +249,7 @@ class _d_attendanceState extends State<d_attendance> {
     );
   }
 
-  Widget _buildTotalCountSection() {
-    final totalGoingCount = goingDestinationCounts['Total'] ?? 0;
-
+  Widget _buildTotalCountSection(int totalCount) {
     return Container(
       width: 375.0, // Adjust the width as needed
       child: Card(
@@ -285,7 +267,7 @@ class _d_attendanceState extends State<d_attendance> {
                 ),
               ),
               const SizedBox(height: 10),
-              _buildTotalCountCard("Total", totalGoingCount),
+              _buildTotalCountCard("Total", totalCount),
             ],
           ),
         ),
