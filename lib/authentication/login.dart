@@ -10,7 +10,6 @@ import 'package:lego/components/responsive_widget.dart';
 import 'package:lego/driver_include/drivermain.dart';
 import 'package:lego/screen/admin.dart';
 import 'package:lego/user_include/usermain.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -23,21 +22,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    checkLoggedInStatus();
-  }
-
-  void checkLoggedInStatus() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
-    if (isLoggedIn) {
-      // User is already logged in, navigate to the home page
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const UserMainPage(), // or any other home page
-        ),
-      );
-    }
   }
 
   bool _isObscure3 = true;
@@ -350,27 +334,24 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void route() async {
-    User? user = FirebaseAuth.instance.currentUser;
+  void route(User user) {
     var kk = FirebaseFirestore.instance
         .collection('users')
-        .doc(user!.uid)
+        .doc(user.uid)
         .get()
         .then((DocumentSnapshot documentSnapshot) async {
       if (documentSnapshot.exists) {
+        print('User role: ${documentSnapshot.get('rool')}');
         if (documentSnapshot.get('rool') == "Admin") {
-          final SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setBool('isLoggedIn', true);
+          print('Navigating to AdminPage');
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => const AdminPage(),
             ),
           );
-        } else if ((documentSnapshot.get('rool') == "driver")) {
-          // Save login status to SharedPreferences
-          final SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setBool('isLoggedIn', true);
+        } else if (documentSnapshot.get('rool') == "driver") {
+          print('Navigating to DriverMainPage');
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -378,9 +359,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
           );
         } else {
-          // Save login status to SharedPreferences
-          final SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setBool('isLoggedIn', true);
+          print('Navigating to UserMainPage');
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -405,9 +384,8 @@ class _LoginPageState extends State<LoginPage> {
           password: password,
         );
         // Set the isLoggedIn flag to true
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setBool('isLoggedIn', true);
-        route();
+
+        route(userCredential.user!);
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
           // Show a user-friendly message to the user

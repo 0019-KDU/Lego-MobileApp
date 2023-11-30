@@ -32,18 +32,22 @@ class _AdminSeatResponseScreenState extends State<AdminSeatResponseScreen> {
   }
 
   Future<void> fetchData() async {
-    final snapshot = await _firestore.collection('seat_requests').get();
-    final requestsData = snapshot.docs.map((doc) {
-      final data = doc.data() as Map<String, dynamic>;
-      data['id'] = doc.id; // Store the document ID for reference
-      return data;
-    }).toList();
+    try {
+      final snapshot = await _firestore.collection('seat_requests').get();
+      final requestsData = snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id; // Store the document ID for reference
+        return data;
+      }).toList();
 
-    // Filter pending requests
-    pendingRequests = requestsData
-        .where((request) =>
-            (request['status'] == 'pending' || request['status'] == null))
-        .toList();
+      // Filter pending requests
+      pendingRequests = requestsData
+          .where((request) =>
+              (request['status'] == 'pending' || request['status'] == null))
+          .toList();
+    } catch (e) {
+      print('Error fetching data: $e');
+    }
   }
 
   Future<String?> fetchUsername(String? userId) async {
@@ -201,25 +205,33 @@ class _AdminSeatResponseScreenState extends State<AdminSeatResponseScreen> {
                   );
                 }
 
-                final requests = snapshot.data!.docs;
+                final querySnapshots =
+                    snapshot.data as QuerySnapshot<Map<String, dynamic>>;
+                final requests = querySnapshots.docs;
+                print('Fetched data count: ${requests.length}');
 
-                // Filter requests based on status (e.g., only show requests with status 'pending')
+                for (var doc in requests) {
+                  final data = doc.data();
+                  print('Document ID: ${doc.id}, Data: $data');
+                }
+
                 // Filter requests based on status (e.g., only show requests with status 'pending' or empty)
                 final filteredRequests = requests
-                    .where((request) =>
-                        (request.data() as Map<String, dynamic>)['status'] ==
-                            'pending' ||
-                        (request.data() as Map<String, dynamic>)['status'] ==
-                            null)
+                    .where((queryDocumentSnapshot) =>
+                        (queryDocumentSnapshot.data())['status'] == 'Pending' ||
+                        (queryDocumentSnapshot.data())['status'] == null)
                     .toList();
 
                 return ListView.builder(
                   itemCount: filteredRequests.length,
                   itemBuilder: (context, index) {
-                    final request =
-                        filteredRequests[index].data() as Map<String, dynamic>;
+                    final request = filteredRequests[index].data();
                     final requestId = filteredRequests[index].id;
                     final userId = request['userId'] as String?;
+
+                    // Print the status to check its value
+                    print('Request Status: ${request['status']}');
+
                     String username =
                         'Username: User not found'; // Default value
 
@@ -291,7 +303,7 @@ class _AdminSeatResponseScreenState extends State<AdminSeatResponseScreen> {
                 );
               },
             ),
-          )
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(

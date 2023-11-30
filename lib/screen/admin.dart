@@ -3,9 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:lego/admin_include/additional.dart';
 import 'package:lego/admin_include/daily_attendance.dart';
 import 'package:lego/admin_include/editinformation.dart';
-import 'package:lego/admin_include/location_page.dart';
 import 'package:lego/admin_include/payment.dart';
 import 'package:lego/admin_include/sendnotificationscreen.dart';
+import 'package:lego/admin_include/travel_page.dart';
 import 'package:lego/admin_include/user_count.dart';
 import 'package:lego/authentication/auth_helper.dart';
 
@@ -21,7 +21,7 @@ class _AdminPageState extends State<AdminPage> {
 
   List imgSrc = [
     "assets/att.png",
-    "assets/location.gif",
+    "assets/notebook.gif",
     "assets/bubble-chat.gif",
     "assets/notifications.gif",
     "assets/payment-app.gif",
@@ -191,8 +191,7 @@ class _AdminPageState extends State<AdminPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        RuntimeLocationDriver([index]),
+                                    builder: (context) => TravelForm([index]),
                                   ),
                                 );
                                 break;

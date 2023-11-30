@@ -216,9 +216,9 @@ class _ComeGoingState extends State<ComeGoing> {
       future: _getSelectedValuesForCurrentDay(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return _buildLoadingIndicator();
         } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
+          return _buildErrorWidget(snapshot.error);
         } else {
           Map<String, dynamic>? values = snapshot.data as Map<String, dynamic>?;
 
@@ -226,21 +226,49 @@ class _ComeGoingState extends State<ComeGoing> {
             String goingValue = values['going'] ?? 'Not selected';
             String comingValue = values['coming'] ?? 'Not selected';
 
-            return Column(
-              children: [
-                Text(
-                  "Suriyawawa To Home: $goingValue",
-                ),
-                Text(
-                  "Home To Suriyawawa: $comingValue",
-                ),
-              ],
-            );
+            return _buildSelectedValuesColumn(goingValue, comingValue);
           } else {
-            return const Text('No data found for the current day.');
+            return _buildNoDataFoundWidget();
           }
         }
       },
+    );
+  }
+
+  Widget _buildLoadingIndicator() {
+    return Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget _buildErrorWidget(dynamic error) {
+    return Center(
+      child: Text('Error: $error'),
+    );
+  }
+
+  Widget _buildSelectedValuesColumn(String goingValue, String comingValue) {
+    return Column(
+      children: [
+        _buildSelectedValueText("Suriyawawa To Home", goingValue),
+        _buildSelectedValueText("Home To Suriyawawa", comingValue),
+      ],
+    );
+  }
+
+  Widget _buildSelectedValueText(String label, String value) {
+    return Text(
+      "$label: $value",
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  Widget _buildNoDataFoundWidget() {
+    return Center(
+      child: Text('No data found for the current day.'),
     );
   }
 

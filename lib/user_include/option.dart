@@ -26,12 +26,7 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
   @override
   void initState() {
     super.initState();
-    getBannerMessage().then((message) {
-      setState(() {
-        bannerMessage = message ??
-            ''; // Set the banner message or an empty string if it's not available.
-      });
-    });
+    fetchBannerMessage();
   }
 
   Future<int> getSeatPrice(int requestedSeats) async {
@@ -53,19 +48,36 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
     return 0; // Default price if not found, as an integer
   }
 
-  Future<String?> getBannerMessage() async {
+  Future<void> fetchBannerMessage() async {
     try {
-      final bannerQuery = await _firestore.collection('banner_messages').get();
+      final bannerDoc = await _firestore
+          .collection('banner_messages')
+          .doc('MK2sQKkVWGqkH6TRyZA0')
+          .get();
 
-      if (bannerQuery.docs.isNotEmpty) {
-        final bannerDoc = bannerQuery.docs.first;
-        return bannerDoc.data()['message'] as String?;
+      if (bannerDoc.exists) {
+        final message = bannerDoc.get('message');
+        if (message != null) {
+          setState(() {
+            bannerMessage = 'Exter passenger payed: \$${message.toString()}';
+          });
+        } else {
+          print('Invalid user help message format: $message');
+          setState(() {
+            bannerMessage = 'Invalid user help message format.';
+          });
+        }
+      } else {
+        setState(() {
+          bannerMessage = 'No user help message found.';
+        });
       }
     } catch (e) {
       print('Error fetching banner message: $e');
+      setState(() {
+        bannerMessage = 'Error fetching user help message.';
+      });
     }
-
-    return null;
   }
 
   bool showRequestDetails = true;
@@ -85,6 +97,29 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              const SizedBox(
+                height: 30,
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey, // Choose the color of the border
+                    width: 1.0, // Adjust the width of the border
+                  ),
+                  borderRadius:
+                      BorderRadius.circular(10), // Adjust the border radius
+                ),
+                child: Text(
+                  bannerMessage,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
               const SizedBox(
                 height: 30,
               ),
@@ -411,41 +446,6 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
                   },
                 ),
               ),
-
-              if (bannerMessage.isNotEmpty)
-                SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(
-                              10.0), // Adjust the radius as needed
-                        ),
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                bannerMessage,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            const Icon(
-                              Icons.history_sharp,
-                              color: Colors.white,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
             ],
           ),
         ),

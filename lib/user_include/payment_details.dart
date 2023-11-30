@@ -16,16 +16,18 @@ class MainCard extends StatefulWidget {
 
 class _MainCardState extends State<MainCard> {
   String? userName;
-  double? cost;
+  double? price;
   String? costMessage;
   String? userRole;
   File? userImage; // Declare userImage as a class member variable
+  double? cost;
 
   @override
   void initState() {
     super.initState();
     fetchUserName();
     fetchUserData();
+    fetchRequestSeatCost();
   }
 
   Future<void> fetchUserName() async {
@@ -68,10 +70,10 @@ class _MainCardState extends State<MainCard> {
         final costDoc = await costCollection.doc("cost").get();
         if (costDoc.exists) {
           setState(() {
-            cost = costDoc.get("price")?.toDouble();
+            price = costDoc.get("price")?.toDouble();
 
             // Set the display message based on the user's role
-            costMessage = userRole == "permanent"
+            costMessage = userRole == "Permanent"
                 ? 'Your Monthly Payment Due is:'
                 : 'You must pay per ride:';
           });
@@ -130,6 +132,95 @@ class _MainCardState extends State<MainCard> {
             );
           },
         );
+      }
+    }
+  }
+
+  Future<void> fetchRequestSeatCost() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser != null) {
+      final userDoc = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(currentUser.uid)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          userName = userDoc.get("username");
+          userRole = userDoc.get("rool");
+        });
+
+        print("User Role: $userRole");
+
+        if (userRole == "Permanent") {
+          // Fetch the cost based on the user's role
+          final costCollection =
+              FirebaseFirestore.instance.collection("permant");
+
+          final costDoc = await costCollection.doc("cost").get();
+          if (costDoc.exists) {
+            setState(() {
+              cost = costDoc.get("price")?.toDouble();
+              costMessage = 'Your Monthly Payment Due is:';
+            });
+          } else {
+            print("Cost document does not exist for Permanent user");
+          }
+
+          // Fetch the number of approved seat requests for Permanent users
+          final requestHistoryCollection =
+              FirebaseFirestore.instance.collection("request_history");
+
+          final approvedRequestsSnapshot = await requestHistoryCollection
+              .where("userUID", isEqualTo: currentUser.uid)
+              .where("status", isEqualTo: "approved")
+              .get();
+
+          final numberOfApprovedRequests = approvedRequestsSnapshot.size;
+
+          print("Number of Approved Requests: $numberOfApprovedRequests");
+
+          // Calculate the total cost based on the number of approved seat requests
+          setState(() {
+            cost = cost! * numberOfApprovedRequests;
+          });
+        } else {
+          // Non-Permanent user
+          // Fetch the cost based on the user's role
+          final costCollection =
+              FirebaseFirestore.instance.collection("non_permant");
+
+          final costDoc = await costCollection.doc("cost").get();
+          if (costDoc.exists) {
+            setState(() {
+              cost = costDoc.get("price")?.toDouble();
+              costMessage = 'You must pay per ride:';
+            });
+          } else {
+            print("Cost document does not exist for Non-Permanent user");
+          }
+
+          // Fetch the number of approved seat requests for Non-Permanent users
+          final requestHistoryCollection =
+              FirebaseFirestore.instance.collection("request_history");
+
+          final approvedRequestsSnapshot = await requestHistoryCollection
+              .where("userUID", isEqualTo: currentUser.uid)
+              .where("status", isEqualTo: "approved")
+              .get();
+
+          final numberOfApprovedRequests = approvedRequestsSnapshot.size;
+
+          print("Number of Approved Requests: $numberOfApprovedRequests");
+
+          // Calculate the total cost based on the number of approved seat requests
+          setState(() {
+            cost = cost! * numberOfApprovedRequests;
+          });
+        }
+      } else {
+        print("User document does not exist");
       }
     }
   }
@@ -206,15 +297,39 @@ class _MainCardState extends State<MainCard> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Text(
-                      cost != null
-                          ? '$costMessage \$${cost?.toStringAsFixed(2)}'
-                          : 'Cost: Loading...',
-                      style: const TextStyle(
-                        fontSize: 18,
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors
+                              .black, // You can change the color to your preference
+                          width: 2.0,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 10),
+                          Text(
+                            cost != null
+                                ? '$costMessage \$${price?.toStringAsFixed(2)}'
+                                : 'Cost: Loading...',
+                            style: const TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                          const SizedBox(height: 25),
+                          Text(
+                            'Request Seat Cost: ${cost?.toStringAsFixed(2) ?? 'Loading...'}',
+                            style: const TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 25),
+                    const SizedBox(height: 20),
                     Container(
                       width: 380,
                       height: 290,
