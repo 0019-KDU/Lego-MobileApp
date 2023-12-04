@@ -30,7 +30,7 @@ class _AdminPageState extends State<AdminPage> {
 
   List titles = [
     "ATTENDANCE",
-    "LOCATION",
+    "NOTE",
     "REQUEST",
     "NOTIFICATION",
     "USER PAYMENTT",
