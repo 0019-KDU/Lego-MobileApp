@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:lego/classes/weather_service.dart';
 import 'package:lego/classes/wether_model.dart';
 import 'package:lego/components/drawer.dart';
-import 'package:lego/user_include/exit_comeing.dart';
-import 'package:lego/user_include/location.dart';
-import 'package:lego/user_include/option.dart';
-import 'package:lego/user_include/payment_details.dart';
+import 'package:lego/screens/user_include/exit_comeing.dart';
+import 'package:lego/screens/user_include/location.dart';
+import 'package:lego/screens/user_include/seatRequestscreen.dart';
+import 'package:lego/screens/user_include/payment_details.dart';
 import 'package:lottie/lottie.dart';
 
 class UserMainPage extends StatefulWidget {
@@ -195,7 +195,7 @@ class _UserMainPageState extends State<UserMainPage>
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const ComeGoing()),
+                                    builder: (context) => const ComeGoing([])),
                               );
                             },
                           ),

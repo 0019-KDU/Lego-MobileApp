@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:lego/admin_include/additional.dart';
-import 'package:lego/admin_include/daily_attendance.dart';
-import 'package:lego/admin_include/editinformation.dart';
-import 'package:lego/admin_include/payment.dart';
-import 'package:lego/admin_include/sendnotificationscreen.dart';
-import 'package:lego/admin_include/travel_page.dart';
-import 'package:lego/admin_include/user_count.dart';
+
+
 import 'package:lego/authentication/auth_helper.dart';
+import 'package:lego/screens/admin_include/additional.dart';
+import 'package:lego/screens/admin_include/editinformation.dart';
+import 'package:lego/screens/admin_include/payment.dart';
+import 'package:lego/screens/admin_include/sendnotificationscreen.dart';
+import 'package:lego/screens/admin_include/travel_page.dart';
+import 'package:lego/screens/admin_include/user_count.dart';
+import 'package:lego/screens/user_include/exit_comeing.dart';
+
 
 class AdminPage extends StatefulWidget {
   const AdminPage({super.key});

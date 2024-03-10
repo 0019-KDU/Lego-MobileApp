@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:lego/user_include/attendance_history.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
+import 'package:lego/screens/user_include/attendance_history.dart';
 
 class ComeGoing extends StatefulWidget {
-  const ComeGoing({super.key});
+  const ComeGoing(List<int> list, {super.key});
 
   @override
   State<ComeGoing> createState() => _ComeGoingState();
@@ -71,6 +74,13 @@ class _ComeGoingState extends State<ComeGoing> {
           _showDialog("Success", "Value successfully saved.");
         }
       }
+      setState(() {
+        if (tripType == 'Going') {
+          selectedGoingValue = existsSelected;
+        } else if (tripType == 'Coming') {
+          selectedComingValue = existsSelected;
+        }
+      });
     } catch (e) {
       print("Error in _storeSelectedValue: $e");
       _showDialog("Error", "An error occurred while processing your request.");
@@ -148,11 +158,13 @@ class _ComeGoingState extends State<ComeGoing> {
               "selectedValue": selectedValue,
               "timestamp": FieldValue.serverTimestamp(),
             });
-
             setState(() {
-              existsSelected = selectedValue;
+              if (tripType == 'Going') {
+                selectedGoingValue = selectedValue;
+              } else if (tripType == 'Coming') {
+                selectedComingValue = selectedValue;
+              }
             });
-
             _showDialog("Success", "Value successfully edited.");
           }
         }
@@ -206,38 +218,26 @@ class _ComeGoingState extends State<ComeGoing> {
   void initState() {
     super.initState();
     _fromkey = GlobalKey<FormState>();
+    _fetchSelectedValues(); // Call a method to fetch and set selected values
   }
 
   String? selectedGoingValue; // Variable for "Suriyawawa To Home"
   String? selectedComingValue; // Variable for "Home To Suriyawawa"
-
-  Widget _buildSelectedValues() {
-    return FutureBuilder(
-      future: _getSelectedValuesForCurrentDay(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return _buildLoadingIndicator();
-        } else if (snapshot.hasError) {
-          return _buildErrorWidget(snapshot.error);
-        } else {
-          Map<String, dynamic>? values = snapshot.data as Map<String, dynamic>?;
-
-          if (values != null) {
-            String goingValue = values['going'] ?? 'Not selected';
-            String comingValue = values['coming'] ?? 'Not selected';
-
-            return _buildSelectedValuesColumn(goingValue, comingValue);
-          } else {
-            return _buildNoDataFoundWidget();
-          }
-        }
-      },
-    );
-  }
-
-  Widget _buildLoadingIndicator() {
-    return Center(
-      child: CircularProgressIndicator(),
+  bool userHasSelected = false;
+// Modify _buildSelectedValuesColumn to set userHasSelected flag
+  Widget _buildSelectedValuesColumn(String goingValue, String comingValue) {
+    return Column(
+      children: [
+        if (goingValue.isNotEmpty || comingValue.isNotEmpty)
+          Column(
+            children: [
+              _buildSelectedValueText("Suriyawawa To Home", goingValue),
+              _buildSelectedValueText("Home To Suriyawawa", comingValue),
+            ],
+          ),
+        if (goingValue.isEmpty && comingValue.isEmpty)
+          _buildNoDataFoundWidget(),
+      ],
     );
   }
 
@@ -247,19 +247,10 @@ class _ComeGoingState extends State<ComeGoing> {
     );
   }
 
-  Widget _buildSelectedValuesColumn(String goingValue, String comingValue) {
-    return Column(
-      children: [
-        _buildSelectedValueText("Suriyawawa To Home", goingValue),
-        _buildSelectedValueText("Home To Suriyawawa", comingValue),
-      ],
-    );
-  }
-
   Widget _buildSelectedValueText(String label, String value) {
     return Text(
       "$label: $value",
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.bold,
       ),
@@ -267,9 +258,19 @@ class _ComeGoingState extends State<ComeGoing> {
   }
 
   Widget _buildNoDataFoundWidget() {
-    return Center(
+    return const Center(
       child: Text('No data found for the current day.'),
     );
+  }
+
+  Future<void> _fetchSelectedValues() async {
+    final values = await _getSelectedValuesForCurrentDay();
+    if (values != null) {
+      setState(() {
+        selectedGoingValue = values['going'];
+        selectedComingValue = values['coming'];
+      });
+    }
   }
 
   Future<Map<String, dynamic>?> _getSelectedValuesForCurrentDay() async {
@@ -335,6 +336,15 @@ class _ComeGoingState extends State<ComeGoing> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(
+          color: Colors.white, // Change the color of the leading icon
+        ),
+        title: const Text(
+          'Jouerny',
+          style: TextStyle(
+            color: Colors.white, // Change the color of the title text
+          ),
+        ),
       ),
       body: Form(
         key: _fromkey,
@@ -447,27 +457,31 @@ class _ComeGoingState extends State<ComeGoing> {
                           ),
                         ),
                       ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green.shade400,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(32.0),
+                      SizedBox(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green.shade400,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32.0),
+                            ),
+                            minimumSize: const Size(90, 45),
                           ),
-                          minimumSize: const Size(90, 45),
+                          onPressed: _storeSelectedValue,
+                          child: const Text("Go"),
                         ),
-                        onPressed: _storeSelectedValue,
-                        child: const Text("Go"),
                       ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(32.0),
+                      SizedBox(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32.0),
+                            ),
+                            minimumSize: const Size(90, 45),
                           ),
-                          minimumSize: const Size(90, 45),
+                          onPressed: _editSelectedValue,
+                          child: const Text("Edit"),
                         ),
-                        onPressed: _editSelectedValue,
-                        child: const Text("Edit"),
                       ),
                     ],
                   ),
@@ -493,10 +507,17 @@ class _ComeGoingState extends State<ComeGoing> {
                 ],
               ),
             ),
+            const SizedBox(
+              height: 60.0,
+            ),
             Column(
               children: [
                 // New widget to display selected values
-
+                if (selectedGoingValue != null || selectedComingValue != null)
+                  _buildSelectedValuesColumn(
+                    selectedGoingValue ?? 'Not selected',
+                    selectedComingValue ?? 'Not selected',
+                  ),
                 Container(
                   margin: const EdgeInsets.all(30),
                   child: ElevatedButton(
@@ -518,7 +539,6 @@ class _ComeGoingState extends State<ComeGoing> {
                     child: const Text("History"),
                   ),
                 ),
-                _buildSelectedValues(),
               ],
             ),
           ],

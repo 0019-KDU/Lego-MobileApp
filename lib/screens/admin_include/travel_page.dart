@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:lego/admin_include/specil_history.dart';
 import 'package:lego/classes/specialpassenger.dart';
+import 'package:lego/screens/admin_include/specil_history.dart';
 
 class TravelForm extends StatefulWidget {
   const TravelForm(List<int> list, {Key? key}) : super(key: key);

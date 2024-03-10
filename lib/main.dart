@@ -4,9 +4,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:lego/authentication/login.dart';
 import 'package:lego/driver_include/drivermain.dart';
-import 'package:lego/screen/admin.dart';
-import 'package:lego/user_include/notification.dart';
-import 'package:lego/user_include/usermain.dart';
+import 'package:lego/dashbord/admin.dart';
+import 'package:lego/screens/user_include/notification.dart';
+import 'package:lego/screens/user_include/usermain.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

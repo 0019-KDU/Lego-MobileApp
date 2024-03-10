@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lego/authentication/auth_helper.dart';
-import 'package:lego/screen/profile.dart';
+import 'package:lego/dashbord/profile.dart';
 
 class MyDrawer extends StatelessWidget {
   final OnUsernameChangedCallback onUsernameChanged;

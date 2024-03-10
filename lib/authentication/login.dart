@@ -8,8 +8,9 @@ import 'package:lego/components/app_colors.dart';
 import 'package:lego/components/app_styles.dart';
 import 'package:lego/components/responsive_widget.dart';
 import 'package:lego/driver_include/drivermain.dart';
-import 'package:lego/screen/admin.dart';
-import 'package:lego/user_include/usermain.dart';
+import 'package:lego/dashbord/admin.dart';
+import 'package:lego/screens/user_include/usermain.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
