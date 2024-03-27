@@ -21,8 +21,14 @@ class _TravelFormState extends State<TravelForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Travel Form'),
-      ),
+          title: const Text(
+            'Travel Form',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.black,
+          iconTheme: const IconThemeData(
+            color: Colors.white, // Change the color of the leading icon
+          )),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

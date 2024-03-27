@@ -3,12 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class SpecialHistoryPage extends StatelessWidget {
+  const SpecialHistoryPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Special History Page'),
-      ),
+          title: const Text('Special History Page',
+              style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.black,
+          iconTheme: const IconThemeData(
+            color: Colors.white, // Change the color of the leading icon
+          )),
       body: FutureBuilder(
         future:
             FirebaseFirestore.instance.collection('SpeacialPassenger').get(),

@@ -38,7 +38,11 @@ class _AdminPaymentsState extends State<AdminPayments> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text('Admin Payments'),
+        iconTheme: const IconThemeData(
+          color: Colors.white, // Change the color of the leading icon
+        ),
+        title:
+            const Text('Admin Payments', style: TextStyle(color: Colors.white)),
       ),
       body: paymentItems.isEmpty
           ? const Center(child: Text('No payment data available.'))

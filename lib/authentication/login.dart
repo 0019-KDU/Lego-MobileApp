@@ -11,7 +11,6 @@ import 'package:lego/driver_include/drivermain.dart';
 import 'package:lego/dashbord/admin.dart';
 import 'package:lego/screens/user_include/usermain.dart';
 
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -234,12 +233,12 @@ class _LoginPageState extends State<LoginPage> {
                                       return const FrogetPasswordPage();
                                     }));
                                   },
-                                  child: Text(
+                                  child: const Text(
                                     'Forgot Password?',
-                                    style: ralewayStyle.copyWith(
+                                    style: TextStyle(
                                       fontSize: 12.0,
                                       color: AppColors.mainBlueColor,
-                                      fontWeight: FontWeight.w600,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
@@ -312,9 +311,9 @@ class _LoginPageState extends State<LoginPage> {
                                     child: const Text(
                                       'Register',
                                       style: TextStyle(
-                                        color: Colors.blue,
+                                        color: Colors.black,
                                         fontSize: 14.0,
-                                        fontWeight: FontWeight.w400,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
@@ -351,7 +350,7 @@ class _LoginPageState extends State<LoginPage> {
               builder: (context) => const AdminPage(),
             ),
           );
-        } else if (documentSnapshot.get('rool') == "driver") {
+        } else if (documentSnapshot.get('rool') == "Driver") {
           print('Navigating to DriverMainPage');
           Navigator.pushReplacement(
             context,
@@ -391,14 +390,14 @@ class _LoginPageState extends State<LoginPage> {
         if (e.code == 'user-not-found') {
           // Show a user-friendly message to the user
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('No user found for that email.'),
             ),
           );
         } else if (e.code == 'wrong-password') {
           // Show a user-friendly message to the user
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('Wrong password provided for that user.'),
             ),
           );

@@ -8,14 +8,14 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-class ComeGoing extends StatefulWidget {
-  const ComeGoing(List<int> list, {Key? key}) : super(key: key);
+class DailyAttendance extends StatefulWidget {
+  const DailyAttendance(List<int> list, {Key? key}) : super(key: key);
 
   @override
-  _ComeGoingState createState() => _ComeGoingState();
+  State<DailyAttendance> createState() => _DailyAttendanceState();
 }
 
-class _ComeGoingState extends State<ComeGoing> {
+class _DailyAttendanceState extends State<DailyAttendance> {
   Map<String, int> goingDestinationCounts = {};
   Map<String, int> comingDestinationCounts = {};
   int approvedCount = 0; // Added variable to count approved requests
@@ -197,7 +197,13 @@ class _ComeGoingState extends State<ComeGoing> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text('Destination Counts'),
+        iconTheme: const IconThemeData(
+          color: Colors.white, // Change the color of the leading icon
+        ),
+        title: const Text(
+          'Destination Counts',
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           ElevatedButton(
             onPressed: _clearAndSaveData,
@@ -210,7 +216,7 @@ class _ComeGoingState extends State<ComeGoing> {
               padding: const EdgeInsets.all(
                   10.0), // Increase the padding to increase the button size
             ),
-            child: const Icon(Icons.clear,
+            child: const Icon(Icons.delete,
                 color: Colors.white), // You can add an icon
           )
         ],

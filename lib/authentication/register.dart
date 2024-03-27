@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lego/components/app_styles.dart';
+import 'package:lottie/lottie.dart';
 
 import 'login.dart';
 // import 'model.dart';
@@ -37,32 +38,21 @@ class _RegisterState extends State<Register> {
     'Permanent',
     'Non-Permanent',
   ];
-  var _currentItemSelected = "Permanent";
+  final _currentItemSelected = "Permanent";
   var rool = "Non-Permanent";
 
-  int activeIndex = 0;
-  late Timer _timer; // Declare _timer here
+  int activeIndex = 0; // Declare _timer here
 
   @override
   void initState() {
     super.initState();
 
     // Store a reference to the timer so you can cancel it in dispose
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (mounted) {
-        setState(() {
-          activeIndex++;
-
-          if (activeIndex == 4) activeIndex = 0;
-        });
-      }
-    });
   }
 
   @override
   void dispose() {
     // Cancel the timer in the dispose method to prevent further calls
-    _timer.cancel();
 
     super.dispose();
   }
@@ -88,71 +78,21 @@ class _RegisterState extends State<Register> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SizedBox(
-                          height: 420,
-                          child: Stack(children: [
-                            Positioned(
-                              top: 50,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              child: AnimatedOpacity(
-                                opacity: activeIndex == 0 ? 1 : 0,
-                                duration: const Duration(
-                                  seconds: 1,
-                                ),
-                                curve: Curves.linear,
-                                child: Image.network(
-                                  'https://ouch-cdn2.icons8.com/As6ct-Fovab32SIyMatjsqIaIjM9Jg1PblII8YAtBtQ/rs:fit:784:784/czM6Ly9pY29uczgu/b3VjaC1wcm9kLmFz/c2V0cy9zdmcvNTg4/LzNmMDU5Mzc0LTky/OTQtNDk5MC1hZGY2/LTA2YTkyMDZhNWZl/NC5zdmc.png',
+                          height: 300,
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                top: 50,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                child: Lottie.asset(
+                                  'assets/bus.json', // Path to your JSON animation file
                                   height: 250,
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              top: 50,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              child: AnimatedOpacity(
-                                opacity: activeIndex == 1 ? 1 : 0,
-                                duration: const Duration(seconds: 1),
-                                curve: Curves.linear,
-                                child: Image.asset(
-                                  'assets/background.png',
-                                  height: 250,
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              top: 50,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              child: AnimatedOpacity(
-                                opacity: activeIndex == 2 ? 1 : 0,
-                                duration: const Duration(seconds: 1),
-                                curve: Curves.linear,
-                                child: Image.asset(
-                                  'assets/signup.png',
-                                  height: 250,
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              top: 50,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              child: AnimatedOpacity(
-                                opacity: activeIndex == 3 ? 1 : 0,
-                                duration: const Duration(seconds: 1),
-                                curve: Curves.linear,
-                                child: Image.network(
-                                  'https://ouch-cdn2.icons8.com/AVdOMf5ui4B7JJrNzYULVwT1z8NlGmlRYZTtg1F6z9E/rs:fit:784:767/czM6Ly9pY29uczgu/b3VjaC1wcm9kLmFz/c2V0cy9zdmcvOTY5/L2NlMTY1MWM5LTRl/ZjUtNGRmZi05MjQ3/LWYzNGQ1MzhiOTQ0/Mi5zdmc.png',
-                                  height: 250,
-                                ),
-                              ),
-                            )
-                          ]),
+                            ],
+                          ),
                         ),
                         Container(
                           alignment: Alignment.centerLeft,
@@ -430,45 +370,45 @@ class _RegisterState extends State<Register> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            Checkbox(
+                              value: rool == "Permanent",
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  rool = value! ? "Permanent" : "Non-Permanent";
+                                });
+                              },
+                            ),
                             const Text(
-                              "Role : ",
+                              "Permanent",
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                             ),
-                            DropdownButton<String>(
-                              dropdownColor: Colors.blue[900],
-                              isDense: true,
-                              isExpanded: false,
-                              iconEnabledColor: Colors.black,
-                              focusColor: Colors.black,
-                              items: options.map((String dropDownStringItem) {
-                                return DropdownMenuItem<String>(
-                                  value: dropDownStringItem,
-                                  child: Text(
-                                    dropDownStringItem,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (newValueSelected) {
+                            const SizedBox(
+                                width:
+                                    20), // Add some space between the checkboxes
+                            Checkbox(
+                              value: rool == "Non-Permanent",
+                              onChanged: (bool? value) {
                                 setState(() {
-                                  _currentItemSelected = newValueSelected!;
-                                  rool = newValueSelected;
+                                  rool = value! ? "Non-Permanent" : "Permanent";
                                 });
                               },
-                              value: _currentItemSelected,
+                            ),
+                            const Text(
+                              "Non-Permanent",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
                           ],
                         ),
                         const SizedBox(
-                          height: 20,
+                          height: 25,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -501,6 +441,9 @@ class _RegisterState extends State<Register> {
                             ),
                           ],
                         ),
+                        const SizedBox(
+                          height: 20.0,
+                        ),
                         Center(
                           child: GestureDetector(
                             onTap: () {
@@ -512,18 +455,18 @@ class _RegisterState extends State<Register> {
                               );
                             },
                             child: RichText(
-                              text: TextSpan(
+                              text: const TextSpan(
                                 text: "You already have an account? ",
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 15,
                                 ),
                                 children: <TextSpan>[
                                   TextSpan(
                                     text: "Login",
-                                    style: ralewayStyle.copyWith(
+                                    style: TextStyle(
                                         color: Colors
-                                            .greenAccent, // Change the color to your desired color
+                                            .black, // Change the color to your desired color
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold),
                                   ),

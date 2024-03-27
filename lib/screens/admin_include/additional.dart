@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lego/screens/admin_include/request_history_page.dart';
 
-
 class AdminSeatResponseScreen extends StatefulWidget {
   const AdminSeatResponseScreen(List<int> list, {Key? key}) : super(key: key);
 
@@ -151,7 +150,14 @@ class _AdminSeatResponseScreenState extends State<AdminSeatResponseScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Seat Response'),
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(
+          color: Colors.white, // Change the color of the leading icon
+        ),
+        title: const Text(
+          'Admin Seat Response',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: Column(
         children: [
