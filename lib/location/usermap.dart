@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserMapPage extends StatefulWidget {
-  const UserMapPage({Key? key}) : super(key: key);
+  const UserMapPage({super.key});
 
   @override
   _UserMapPageState createState() => _UserMapPageState();

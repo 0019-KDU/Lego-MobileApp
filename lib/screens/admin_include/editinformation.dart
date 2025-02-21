@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class EditInformation extends StatefulWidget {
-  const EditInformation({Key? key}) : super(key: key);
+  const EditInformation({super.key});
 
   @override
   State<EditInformation> createState() => _EditInformationState();

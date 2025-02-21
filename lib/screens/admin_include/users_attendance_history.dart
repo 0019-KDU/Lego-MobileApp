@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 class PreviousWeekAttendancePage extends StatelessWidget {
   final Map<String, Map<String, int>> previousWeekData;
 
-  const PreviousWeekAttendancePage({Key? key, required this.previousWeekData})
-      : super(key: key);
+  const PreviousWeekAttendancePage({super.key, required this.previousWeekData});
 
   @override
   Widget build(BuildContext context) {

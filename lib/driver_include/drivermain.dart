@@ -6,7 +6,7 @@ import 'package:lego/driver_include/location_service.dart';
 import 'package:lego/dashbord/driver.dart';
 
 class DriverMainPage extends StatefulWidget {
-  const DriverMainPage({Key? key}) : super(key: key);
+  const DriverMainPage({super.key});
 
   @override
   State<DriverMainPage> createState() => _DriverMainPageState();

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lego/screens/admin_include/request_history_page.dart';
 
 class AdminSeatResponseScreen extends StatefulWidget {
-  const AdminSeatResponseScreen(List<int> list, {Key? key}) : super(key: key);
+  const AdminSeatResponseScreen(List<int> list, {super.key});
 
   @override
   State<AdminSeatResponseScreen> createState() =>

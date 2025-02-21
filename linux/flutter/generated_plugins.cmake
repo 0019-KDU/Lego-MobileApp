@@ -4,7 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_linux
-  modal_progress_hud_nsn
+  open_file_linux
   printing
   url_launcher_linux
 )

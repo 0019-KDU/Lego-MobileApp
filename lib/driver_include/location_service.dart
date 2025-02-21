@@ -7,12 +7,10 @@ class LocationService {
       FirebaseDatabase.instance.ref().child('locations');
 
   Future<void> shareLocation() async {
-    final LocationData? location = await _location.getLocation();
-    if (location != null) {
-      await _databaseReference.set({
-        'latitude': location.latitude,
-        'longitude': location.longitude,
-      });
+    final LocationData location = await _location.getLocation();
+    await _databaseReference.set({
+      'latitude': location.latitude,
+      'longitude': location.longitude,
+    });
     }
-  }
 }

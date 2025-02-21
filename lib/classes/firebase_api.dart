@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class NotificationState extends StatefulWidget {
-  const NotificationState({Key? key}) : super(key: key);
+  const NotificationState({super.key});
 
   @override
   _NotificationStateState createState() => _NotificationStateState();
@@ -83,8 +83,8 @@ class _NotificationStateState extends State<NotificationState> {
   Future getDeviceToken() async {
     //request user permission for push notification
     FirebaseMessaging.instance.requestPermission();
-    FirebaseMessaging _firebaseMessage = FirebaseMessaging.instance;
-    String? deviceToken = await _firebaseMessage.getToken();
+    FirebaseMessaging firebaseMessage = FirebaseMessaging.instance;
+    String? deviceToken = await firebaseMessage.getToken();
     return (deviceToken == null) ? "" : deviceToken;
   }
 }

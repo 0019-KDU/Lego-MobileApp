@@ -9,7 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class DailyAttendance extends StatefulWidget {
-  const DailyAttendance(List<int> list, {Key? key}) : super(key: key);
+  const DailyAttendance(List<int> list, {super.key});
 
   @override
   State<DailyAttendance> createState() => _DailyAttendanceState();
@@ -35,27 +35,31 @@ class _DailyAttendanceState extends State<DailyAttendance> {
   Future<void> _clearAndSaveData() async {
     if (goingDestinationCounts.isEmpty && comingDestinationCounts.isEmpty) {
       // No data available to clear
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("No data to clear."),
-      ));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("No data to clear.")));
       return;
     }
 
     // Clear the current data from the collections
-    final goingValuesCollection =
-        FirebaseFirestore.instance.collection("going_values");
-    final comingValuesCollection =
-        FirebaseFirestore.instance.collection("coming_values");
-    final seatRequestsCollection =
-        FirebaseFirestore.instance.collection("seat_requests");
+    final goingValuesCollection = FirebaseFirestore.instance.collection(
+      "going_values",
+    );
+    final comingValuesCollection = FirebaseFirestore.instance.collection(
+      "coming_values",
+    );
+    final seatRequestsCollection = FirebaseFirestore.instance.collection(
+      "seat_requests",
+    );
 
     await _clearCollection(goingValuesCollection);
     await _clearCollection(comingValuesCollection);
     await _clearCollection(seatRequestsCollection);
 
     // Save the current data to a new document in the attendance history collection
-    final attendanceHistoryCollection =
-        FirebaseFirestore.instance.collection("attendance_history");
+    final attendanceHistoryCollection = FirebaseFirestore.instance.collection(
+      "attendance_history",
+    );
     final DateTime now = DateTime.now();
     final String formattedDate = DateFormat('yyyy-MM-dd').format(now);
 
@@ -78,14 +82,18 @@ class _DailyAttendanceState extends State<DailyAttendance> {
         approvedCount = 0;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Data has been cleared and saved to attendance history."),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Data has been cleared and saved to attendance history.",
+          ),
+        ),
+      );
     } catch (e) {
       // Handle any errors that occur during saving
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Error saving data: $e"),
-      ));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error saving data: $e")));
     }
   }
 
@@ -99,23 +107,36 @@ class _DailyAttendanceState extends State<DailyAttendance> {
   Future<void> _calculateDestinationCounts() async {
     try {
       final currentTime = DateTime.now();
-      final startOfDay =
-          DateTime(currentTime.year, currentTime.month, currentTime.day);
+      final startOfDay = DateTime(
+        currentTime.year,
+        currentTime.month,
+        currentTime.day,
+      );
       final endOfDay = startOfDay.add(const Duration(days: 1));
 
-      final goingValuesCollection =
-          FirebaseFirestore.instance.collection("going_values");
-      final comingValuesCollection =
-          FirebaseFirestore.instance.collection("coming_values");
+      final goingValuesCollection = FirebaseFirestore.instance.collection(
+        "going_values",
+      );
+      final comingValuesCollection = FirebaseFirestore.instance.collection(
+        "coming_values",
+      );
 
-      final goingQuerySnapshot = await goingValuesCollection
-          .where("timestamp",
-              isGreaterThanOrEqualTo: startOfDay, isLessThan: endOfDay)
-          .get();
-      final comingQuerySnapshot = await comingValuesCollection
-          .where("timestamp",
-              isGreaterThanOrEqualTo: startOfDay, isLessThan: endOfDay)
-          .get();
+      final goingQuerySnapshot =
+          await goingValuesCollection
+              .where(
+                "timestamp",
+                isGreaterThanOrEqualTo: startOfDay,
+                isLessThan: endOfDay,
+              )
+              .get();
+      final comingQuerySnapshot =
+          await comingValuesCollection
+              .where(
+                "timestamp",
+                isGreaterThanOrEqualTo: startOfDay,
+                isLessThan: endOfDay,
+              )
+              .get();
 
       final goingDocs = goingQuerySnapshot.docs;
       final comingDocs = comingQuerySnapshot.docs;
@@ -124,10 +145,14 @@ class _DailyAttendanceState extends State<DailyAttendance> {
       comingDestinationCounts = _countDestinations(comingDocs);
 
       // Calculate and add total counts for going and coming
-      final int totalGoingCount =
-          goingDestinationCounts.values.fold(0, (a, b) => a + b);
-      final int totalComingCount =
-          comingDestinationCounts.values.fold(0, (a, b) => a + b);
+      final int totalGoingCount = goingDestinationCounts.values.fold(
+        0,
+        (a, b) => a + b,
+      );
+      final int totalComingCount = comingDestinationCounts.values.fold(
+        0,
+        (a, b) => a + b,
+      );
       goingDestinationCounts['Total'] = totalGoingCount;
       comingDestinationCounts['Total'] = totalComingCount;
 
@@ -140,8 +165,9 @@ class _DailyAttendanceState extends State<DailyAttendance> {
       print("Error in _calculateDestinationCounts: $error");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content:
-              Text("An error occurred while calculating destination counts."),
+          content: Text(
+            "An error occurred while calculating destination counts.",
+          ),
         ),
       );
     }
@@ -155,12 +181,13 @@ class _DailyAttendanceState extends State<DailyAttendance> {
     print("Start of the week: $startOfWeek");
     print("End of the week: $endOfWeek");
 
-    final snapshot = await FirebaseFirestore.instance
-        .collection('request_history')
-        .where("status", isEqualTo: "approved")
-        .where("timestamp", isGreaterThanOrEqualTo: startOfWeek)
-        .where("timestamp", isLessThanOrEqualTo: endOfWeek)
-        .get();
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('request_history')
+            .where("status", isEqualTo: "approved")
+            .where("timestamp", isGreaterThanOrEqualTo: startOfWeek)
+            .where("timestamp", isLessThanOrEqualTo: endOfWeek)
+            .get();
 
     int totalApprovedSeats = 0;
 
@@ -211,14 +238,18 @@ class _DailyAttendanceState extends State<DailyAttendance> {
               backgroundColor: Colors.red, // Set the background color to red
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(
-                    10.0), // Set the border radius for a box shape
+                  10.0,
+                ), // Set the border radius for a box shape
               ),
               padding: const EdgeInsets.all(
-                  10.0), // Increase the padding to increase the button size
+                10.0,
+              ), // Increase the padding to increase the button size
             ),
-            child: const Icon(Icons.delete,
-                color: Colors.white), // You can add an icon
-          )
+            child: const Icon(
+              Icons.delete,
+              color: Colors.white,
+            ), // You can add an icon
+          ),
         ],
       ),
       body: Padding(
@@ -256,8 +287,10 @@ class _DailyAttendanceState extends State<DailyAttendance> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue, // Customize button color
                   ),
-                  child: const Text("Report Day",
-                      style: TextStyle(color: Colors.white)),
+                  child: const Text(
+                    "Report Day",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -267,8 +300,10 @@ class _DailyAttendanceState extends State<DailyAttendance> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green, // Customize button color
                   ),
-                  child: const Text("Report History",
-                      style: TextStyle(color: Colors.white)),
+                  child: const Text(
+                    "Report History",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             ),
@@ -291,16 +326,14 @@ class _DailyAttendanceState extends State<DailyAttendance> {
           children: [
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Column(
-              children: destinationCounts.entries.map((entry) {
-                return _buildDestinationCountCard(entry.key, entry.value);
-              }).toList(),
+              children:
+                  destinationCounts.entries.map((entry) {
+                    return _buildDestinationCountCard(entry.key, entry.value);
+                  }).toList(),
             ),
           ],
         ),
@@ -322,16 +355,15 @@ class _DailyAttendanceState extends State<DailyAttendance> {
           children: [
             const Text(
               "Total Destination Counts:",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             _buildTotalCountCard("Going Total", totalGoingCount),
             _buildTotalCountCard("Coming Total", totalComingCount),
             _buildTotalCountCard(
-                "Approved Seat Request", approvedCount), // Added approved count
+              "Approved Seat Request",
+              approvedCount,
+            ), // Added approved count
             const Divider(),
             _buildTotalCountCard("Grand Total", grandTotal),
           ],
@@ -344,10 +376,7 @@ class _DailyAttendanceState extends State<DailyAttendance> {
     return ListTile(
       title: Text(
         title,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
       trailing: Text(
         "Count: $count",
@@ -360,10 +389,7 @@ class _DailyAttendanceState extends State<DailyAttendance> {
     return ListTile(
       title: Text(
         destination,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
       trailing: Text(
         "Count: $count",
@@ -381,8 +407,10 @@ class _DailyAttendanceState extends State<DailyAttendance> {
 
     // Add content to the PDF page
     graphics.drawString(
-        'Report for Current Day', PdfStandardFont(PdfFontFamily.helvetica, 24),
-        bounds: const Rect.fromLTWH(50, 50, 500, 30));
+      'Report for Current Day',
+      PdfStandardFont(PdfFontFamily.helvetica, 24),
+      bounds: const Rect.fromLTWH(50, 50, 500, 30),
+    );
 
     // Add content for "Going" destination counts
     var goingDestinationCountsString =
@@ -390,9 +418,11 @@ class _DailyAttendanceState extends State<DailyAttendance> {
     goingDestinationCounts.forEach((destination, count) {
       goingDestinationCountsString += '$destination: $count\n';
     });
-    graphics.drawString(goingDestinationCountsString,
-        PdfStandardFont(PdfFontFamily.helvetica, 12),
-        bounds: const Rect.fromLTWH(50, 100, 500, 100));
+    graphics.drawString(
+      goingDestinationCountsString,
+      PdfStandardFont(PdfFontFamily.helvetica, 12),
+      bounds: const Rect.fromLTWH(50, 100, 500, 100),
+    );
 
     // Add content for "Coming" destination counts
     var comingDestinationCountsString =
@@ -400,17 +430,21 @@ class _DailyAttendanceState extends State<DailyAttendance> {
     comingDestinationCounts.forEach((destination, count) {
       comingDestinationCountsString += '$destination: $count\n';
     });
-    graphics.drawString(comingDestinationCountsString,
-        PdfStandardFont(PdfFontFamily.helvetica, 12),
-        bounds: const Rect.fromLTWH(50, 250, 500, 100));
+    graphics.drawString(
+      comingDestinationCountsString,
+      PdfStandardFont(PdfFontFamily.helvetica, 12),
+      bounds: const Rect.fromLTWH(50, 250, 500, 100),
+    );
 
     // Add content for other values (you can customize this part)
     var otherValuesString = 'Other Values:\n';
     otherValuesString += 'Approved Seat Request: $approvedCount\n';
 
     graphics.drawString(
-        otherValuesString, PdfStandardFont(PdfFontFamily.helvetica, 12),
-        bounds: const Rect.fromLTWH(50, 400, 500, 100));
+      otherValuesString,
+      PdfStandardFont(PdfFontFamily.helvetica, 12),
+      bounds: const Rect.fromLTWH(50, 400, 500, 100),
+    );
 
     try {
       if (status.isGranted) {
@@ -420,7 +454,7 @@ class _DailyAttendanceState extends State<DailyAttendance> {
         await file.writeAsBytes(await pdfBytes);
 
         // Share the PDF using the 'share_plus' package
-        Share.shareFiles([file.path]);
+        Share.shareXFiles([XFile(file.path)]);
       } else {
         // Handle permission denied or restricted by the user
       }
@@ -438,22 +472,24 @@ class _DailyAttendanceState extends State<DailyAttendance> {
 
     try {
       if (status.isGranted) {
-        final attendanceHistoryCollection =
-            FirebaseFirestore.instance.collection("attendance_history");
+        final attendanceHistoryCollection = FirebaseFirestore.instance
+            .collection("attendance_history");
         final querySnapshot = await attendanceHistoryCollection.get();
 
         for (final doc in querySnapshot.docs) {
-          final data = doc.data() as Map<String, dynamic>;
+          final data = doc.data();
           print('Document ID: ${doc.id}');
 
           var page = pdfDocument.pages.add();
           var graphics = page.graphics;
 
           final formattedDate = data['date'] as String;
-          final goingDestinationCounts =
-              Map<String, int>.from(data['goingDestinationCounts']);
-          final comingDestinationCounts =
-              Map<String, int>.from(data['comingDestinationCounts']);
+          final goingDestinationCounts = Map<String, int>.from(
+            data['goingDestinationCounts'],
+          );
+          final comingDestinationCounts = Map<String, int>.from(
+            data['comingDestinationCounts'],
+          );
           final approvedCount = data['approvedCount'] as int;
 
           // Add content to the PDF page
@@ -489,9 +525,7 @@ class _DailyAttendanceState extends State<DailyAttendance> {
 
           // Add content for other values
           var otherValuesString = 'Other Values:\n';
-          if (approvedCount != null) {
-            otherValuesString += 'Approved Seat Request: $approvedCount\n';
-          }
+          otherValuesString += 'Approved Seat Request: $approvedCount\n';
 
           graphics.drawString(
             otherValuesString,
@@ -512,7 +546,7 @@ class _DailyAttendanceState extends State<DailyAttendance> {
         await file.writeAsBytes(await pdfBytes);
 
         // Share the PDF using the 'share_plus' package
-        Share.shareFiles([file.path]);
+        Share.shareXFiles([XFile(file.path)]);
       } else {
         // Handle permission denied or restricted by the user
       }

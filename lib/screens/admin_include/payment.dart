@@ -14,7 +14,7 @@ class PaymentItem {
 }
 
 class AdminPayments extends StatefulWidget {
-  const AdminPayments(List<int> list, {Key? key}) : super(key: key);
+  const AdminPayments(List<int> list, {super.key});
 
   @override
   State<AdminPayments> createState() => _AdminPaymentsState();

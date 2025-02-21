@@ -6,7 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
 class DriverPage extends StatefulWidget {
-  const DriverPage({Key? key}) : super(key: key);
+  const DriverPage({super.key});
 
   @override
   State<DriverPage> createState() => _DriverPageState();

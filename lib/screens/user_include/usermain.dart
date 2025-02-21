@@ -11,7 +11,7 @@ import 'package:lego/screens/user_include/payment_details.dart';
 import 'package:lottie/lottie.dart';
 
 class UserMainPage extends StatefulWidget {
-  const UserMainPage({Key? key}) : super(key: key);
+  const UserMainPage({super.key});
 
   @override
   State<UserMainPage> createState() => _UserMainPageState();
@@ -34,10 +34,11 @@ class _UserMainPageState extends State<UserMainPage>
     final currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser != null) {
-      final userDoc = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(currentUser.uid)
-          .get();
+      final userDoc =
+          await FirebaseFirestore.instance
+              .collection("users")
+              .doc(currentUser.uid)
+              .get();
 
       if (userDoc.exists) {
         setState(() {
@@ -74,8 +75,6 @@ class _UserMainPageState extends State<UserMainPage>
   }
 
   String getWeatherAnimation(String mainCondition) {
-    if (mainCondition == null) return 'assets/sunny.json';
-
     switch (mainCondition.toLowerCase()) {
       case 'clouds':
       case 'mist':
@@ -118,9 +117,7 @@ class _UserMainPageState extends State<UserMainPage>
                       size: 28,
                     ),
                   ),
-                  const SizedBox(
-                    width: 8,
-                  ),
+                  const SizedBox(width: 8),
                   Flexible(
                     child: Text(
                       'HI $userName ',
@@ -133,9 +130,7 @@ class _UserMainPageState extends State<UserMainPage>
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 30,
-              ),
+              const SizedBox(height: 30),
               Expanded(
                 child: ListView(
                   physics: const BouncingScrollPhysics(),
@@ -150,8 +145,9 @@ class _UserMainPageState extends State<UserMainPage>
                                     "City Name Not Available",
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          Lottie.asset(getWeatherAnimation(
-                              _weather?.mainCondition ?? "")),
+                          Lottie.asset(
+                            getWeatherAnimation(_weather?.mainCondition ?? ""),
+                          ),
                           Text(
                             '${_weather?.temperatuer.round()}ºC',
                             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -163,27 +159,25 @@ class _UserMainPageState extends State<UserMainPage>
                         ],
                       ),
                     ),
-                    const SizedBox(
-                      height: 16,
-                    ),
+                    const SizedBox(height: 16),
                     const Center(
                       child: Text(
                         "Lego",
                         style: TextStyle(
-                            fontSize: 32, fontWeight: FontWeight.bold),
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 48,
-                    ),
+                    const SizedBox(height: 48),
                     const Text(
                       "SERVICE",
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    const SizedBox(
-                      height: 16,
-                    ),
+                    const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -195,14 +189,13 @@ class _UserMainPageState extends State<UserMainPage>
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const ComeGoing([])),
+                                  builder: (context) => const ComeGoing([]),
+                                ),
                               );
                             },
                           ),
                         ),
-                        const SizedBox(
-                          width: 10,
-                        ),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: _cardMenu(
                             title: "LOCATION",
@@ -211,16 +204,15 @@ class _UserMainPageState extends State<UserMainPage>
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const Location()),
+                                  builder: (context) => const Location(),
+                                ),
                               );
                             },
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(
-                      height: 16,
-                    ),
+                    const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -232,15 +224,14 @@ class _UserMainPageState extends State<UserMainPage>
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        const SeatRequestScreen()),
+                                  builder:
+                                      (context) => const SeatRequestScreen(),
+                                ),
                               );
                             },
                           ),
                         ),
-                        const SizedBox(
-                          width: 10,
-                        ),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: _cardMenu(
                             title: "PAYMENT DETAILS",
@@ -249,7 +240,8 @@ class _UserMainPageState extends State<UserMainPage>
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const MainCard()),
+                                  builder: (context) => const MainCard(),
+                                ),
                               );
                             },
                           ),
@@ -278,9 +270,7 @@ class _UserMainPageState extends State<UserMainPage>
       onTap: onTap,
       child: Container(
         width: 190,
-        padding: const EdgeInsets.symmetric(
-          vertical: 30,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 30),
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(24),
@@ -292,7 +282,7 @@ class _UserMainPageState extends State<UserMainPage>
             Text(
               title,
               style: TextStyle(fontWeight: FontWeight.bold, color: fontColor),
-            )
+            ),
           ],
         ),
       ),

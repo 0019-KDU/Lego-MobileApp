@@ -8,8 +8,7 @@ typedef OnUsernameChangedCallback = void Function(String newUsername);
 class ProfilePage extends StatefulWidget {
   final OnUsernameChangedCallback onUsernameChanged;
 
-  const ProfilePage({Key? key, required this.onUsernameChanged})
-      : super(key: key);
+  const ProfilePage({super.key, required this.onUsernameChanged});
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }

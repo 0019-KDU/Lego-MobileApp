@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class d_attendance extends StatefulWidget {
-  const d_attendance({Key? key}) : super(key: key);
+  const d_attendance({super.key});
 
   @override
   State<d_attendance> createState() => _d_attendanceState();
@@ -220,7 +220,7 @@ class _d_attendanceState extends State<d_attendance> {
     String title,
     Map<String, int> destinationCounts,
   ) {
-    return Container(
+    return SizedBox(
       width: 375.0, // Adjust the width as needed
       child: Card(
         elevation: 3,
@@ -250,7 +250,7 @@ class _d_attendanceState extends State<d_attendance> {
   }
 
   Widget _buildTotalCountSection(int totalCount) {
-    return Container(
+    return SizedBox(
       width: 375.0, // Adjust the width as needed
       child: Card(
         elevation: 3,

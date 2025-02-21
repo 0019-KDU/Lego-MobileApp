@@ -6,9 +6,9 @@ class MyDrawer extends StatelessWidget {
   final OnUsernameChangedCallback onUsernameChanged;
 
   const MyDrawer({
-    Key? key,
+    super.key,
     required this.onUsernameChanged,
-  }) : super(key: key);
+  });
 // Function to handle the log out action
 
   @override

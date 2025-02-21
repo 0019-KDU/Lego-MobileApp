@@ -4,7 +4,7 @@ import 'package:lego/classes/specialpassenger.dart';
 import 'package:lego/screens/admin_include/specil_history.dart';
 
 class TravelForm extends StatefulWidget {
-  const TravelForm(List<int> list, {Key? key}) : super(key: key);
+  const TravelForm(List<int> list, {super.key});
 
   @override
   _TravelFormState createState() => _TravelFormState();

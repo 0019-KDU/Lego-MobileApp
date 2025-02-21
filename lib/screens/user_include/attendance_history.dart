@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class AttendanceHistoryScreen extends StatefulWidget {
-  const AttendanceHistoryScreen({Key? key}) : super(key: key);
+  const AttendanceHistoryScreen({super.key});
 
   @override
   State<AttendanceHistoryScreen> createState() =>
@@ -79,7 +79,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                       }
 
                       final isGoingCollection =
-                          document.reference.parent!.id == 'going_values';
+                          document.reference.parent.id == 'going_values';
 
                       IconData icon;
                       Color iconColor;

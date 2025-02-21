@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class PaymentHistoryPage extends StatefulWidget {
-  const PaymentHistoryPage({Key? key}) : super(key: key);
+  const PaymentHistoryPage({super.key});
 
   @override
   _PaymentHistoryPageState createState() => _PaymentHistoryPageState();

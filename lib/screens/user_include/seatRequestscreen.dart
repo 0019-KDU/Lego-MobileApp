@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:lego/components/nm_box.dart';
 
 class SeatRequestScreen extends StatefulWidget {
-  const SeatRequestScreen({Key? key}) : super(key: key);
+  const SeatRequestScreen({super.key});
 
   @override
   State<SeatRequestScreen> createState() => _SeatRequestScreenState();
@@ -478,7 +478,7 @@ class _SeatRequestScreenState extends State<SeatRequestScreen> {
 
     if (userRequests.docs.isNotEmpty) {
       final lastRequest =
-          userRequests.docs.first.data() as Map<String, dynamic>;
+          userRequests.docs.first.data();
       print("Last request data: $lastRequest");
       return lastRequest;
     } else {

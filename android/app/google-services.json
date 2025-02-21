@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "653230705538",
-    "project_id": "lego-3fe7c",
-    "storage_bucket": "lego-3fe7c.appspot.com"
+    "project_number": "610558937754",
+    "project_id": "lego-45983",
+    "storage_bucket": "lego-45983.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:653230705538:android:c1e595aeaf8cfdb7a2dd9b",
+        "mobilesdk_app_id": "1:610558937754:android:8f1519387761128ae8ed23",
         "android_client_info": {
           "package_name": "com.example.lego"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "653230705538-tb4sv2umtdtcp8dagnk48cjmfmblhte3.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBbXnqZ5MvFHynkU5_JM16QuKZCi4-kGD0"
+          "current_key": "AIzaSyCaXmPGSWuydObGqfWVnyzPF7j7gE1HsWU"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "653230705538-tb4sv2umtdtcp8dagnk48cjmfmblhte3.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

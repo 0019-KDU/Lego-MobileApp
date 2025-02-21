@@ -3,7 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class UserCount extends StatelessWidget {
-  const UserCount(List<int> list, {Key? key});
+  const UserCount(List<int> list, {super.key});
+
 
   Future<void> _deleteUser(BuildContext context, String userId) async {
     try {
